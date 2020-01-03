@@ -29,6 +29,7 @@ hs_err_pid*
 *.iml
 *.ipr
 *.iws
+out/
 
 # Gradle
 .gradle/
