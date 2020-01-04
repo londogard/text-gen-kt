@@ -18,8 +18,8 @@ class NGramWordLM(
     override fun predictNext(input: String, temperature: Double): String =
         TODO("Implement this, don't forget to not remove \n etc")
 
-    override fun loadModel(path: String) {
-        internalLanguageModel = readSerializedMapFromFile(path)
+    override fun loadModel(path: String, resource: Boolean) {
+        internalLanguageModel = if (resource) readSerializedMapFromResource(path) else readSerializedMapFromFile(path)
     }
 
     override fun saveModel(path: String) {

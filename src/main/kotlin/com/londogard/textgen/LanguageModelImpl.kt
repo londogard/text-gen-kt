@@ -22,11 +22,9 @@ class LanguageModelImpl(
         }
         when (pretrainedModels) {
             PretrainedModels.CUSTOM -> Unit
-            else -> model.loadModel(getResourcePath(pretrainedModels.path))
+            else -> model.loadModel(pretrainedModels.path)
         }
     }
-
-    private fun getResourcePath(path: String): String = this::class.java.getResource(path).path
 
     override fun generateText(prefix: String, n: Int, temperature: Double): String {
         return (1..n)
@@ -46,7 +44,7 @@ class LanguageModelImpl(
         logger.info("Model saved as $name")
     }
 
-    override fun changeModelToCustom(path: String) = model.loadModel(path)
+    override fun changeModelToCustom(path: String): Unit = model.loadModel(path, false)
 
-    override fun changeModelToPretrained(pretrainedModel: PretrainedModels) = model.loadModel(pretrainedModel.path)
+    override fun changeModelToPretrained(pretrainedModel: PretrainedModels): Unit = model.loadModel(pretrainedModel.path)
 }

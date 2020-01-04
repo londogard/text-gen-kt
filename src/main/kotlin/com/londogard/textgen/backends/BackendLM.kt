@@ -1,5 +1,6 @@
 package com.londogard.textgen.backends
 
+import kotlinx.io.InputStream
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.Cbor
 import java.io.File
@@ -20,14 +21,20 @@ abstract class BackendLM<T> {
     abstract fun predictNext(input: List<String>, temperature: Double = 0.3): String
 
     abstract fun trainModel(path: String, oneDocumentPerLine: Boolean)
-    abstract fun loadModel(path: String)
+    abstract fun loadModel(path: String, resource: Boolean = true)
     abstract fun saveModel(path: String)
+
+    private fun getResource(path: String): InputStream = this::class.java.getResourceAsStream(path)
 
     protected fun serializeMapToFile(name: String, map: Map<List<T>, Double>): Unit = cborSerializer
         .dump(mapSerializer, map)
         .let { File(name).writeBytes(it) }
 
     protected fun readSerializedMapFromFile(name: String): Map<List<T>, Double> = File(name)
+        .readBytes()
+        .let { cborSerializer.load(mapSerializer, it) }
+
+    protected fun readSerializedMapFromResource(name: String): Map<List<T>, Double> = getResource(name)
         .readBytes()
         .let { cborSerializer.load(mapSerializer, it) }
 }
