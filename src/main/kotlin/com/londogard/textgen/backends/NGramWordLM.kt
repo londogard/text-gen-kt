@@ -2,20 +2,21 @@ package com.londogard.textgen.backends
 
 import com.londogard.textgen.NGram
 import com.londogard.textgen.ngramNormalize
-import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.*
 import java.io.File
 import kotlin.math.pow
 import kotlin.random.Random
 
 @ImplicitReflectionSerializer
 class NGramWordLM(
-    override var temperature: Double,
-    override var internalLanguageModel: Map<List<String>, Double>,
-    override val n: Int
+    override val n: Int,
+    override var internalLanguageModel: Map<List<String>, Double> = emptyMap(),
+    override val mapSerializer: KSerializer<Map<List<String>, Double>> = (String::class.serializer().list to Double::class.serializer()).map
 ) :
     BackendLM<String>() {
 
-    override fun predictNext(input: String): String = TODO("Implement this, don't forget to not remove \n etc")
+    override fun predictNext(input: String, temperature: Double): String =
+        TODO("Implement this, don't forget to not remove \n etc")
 
     override fun loadModel(path: String) {
         internalLanguageModel = readSerializedMapFromFile(path)
@@ -49,7 +50,6 @@ class NGramWordLM(
                 .mapValues { it.value.size.toDouble() }
                 .filter { it.key.size == 1 || it.value > 3.0 }
 
-
             val totalCount = internalModel.filterKeys { it.size == 1 }.values.sum()
 
             internalLanguageModel = internalModel
@@ -69,7 +69,7 @@ class NGramWordLM(
         }
     }
 
-    override fun predictNext(input: List<String>): String {
+    override fun predictNext(input: List<String>, temperature: Double): String {
         val history = input.takeLast(n - 1)
         val options = (n downTo 1)
             .asSequence()

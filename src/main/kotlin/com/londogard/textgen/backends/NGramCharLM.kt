@@ -11,6 +11,7 @@ import kotlin.math.pow
 import kotlin.random.Random
 import kotlin.system.exitProcess
 /**
+ * /// (Char::class.serializer().list to Double::class.serializer()).map
 @ImplicitReflectionSerializer
 class NGramCharLM(override var temperature: Double, override var internalLanguageModel: Map<List<Char>, Double>, override val n: Int) :
     BackendLM<Char>() {

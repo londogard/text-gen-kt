@@ -9,13 +9,13 @@ import kotlin.system.measureTimeMillis
 class LanguageModelImpl(
     override val pretrainedModels: PretrainedModels,
     override val generationLevel: GenerationLevel,
-    override val n: Int
+    override val n: Int = 10
 ) : LanguageModel {
     private val model: BackendLM<String>
     private val logger = logger().value
 
     init {
-        model = NGramWordLM(0.3, emptyMap(), n)
+        model = NGramWordLM(n)
         when (pretrainedModels) {
             PretrainedModels.CUSTOM -> Unit
             else -> model.loadModel(getResourcePath(pretrainedModels.path))
@@ -29,9 +29,8 @@ class LanguageModelImpl(
     private fun getResourcePath(path: String): String = this::class.java.getResource(path).path
 
     override fun generateText(prefix: String, n: Int, temperature: Double): String {
-        model.temperature = temperature
         return (1..n)
-            .fold(prefix.ngramNormalize().toList()) { acc, _ -> acc + model.predictNext(acc) }
+            .fold(prefix.ngramNormalize().toList()) { acc, _ -> acc + model.predictNext(acc, temperature) }
             .fold("") { acc, itr -> if (itr.first().isLetterOrDigit()) "$acc $itr" else "$acc$itr" }
     }
 
@@ -50,7 +49,7 @@ class LanguageModelImpl(
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val model = LanguageModelImpl(PretrainedModels.SHAKESPEARE, GenerationLevel.WORD, 10)
+            val model = LanguageModelImpl(PretrainedModels.CARDS_AGAINST_WHITE, GenerationLevel.WORD, 10)
             //model.createCustomModel("/cardsagainst_white.txt", "cardsagainst_white.cbor", false)
             println(model.generateText("have a", 150, 0.1))
         }
