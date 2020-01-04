@@ -1,5 +1,8 @@
 package com.londogard.textgen
 
+import com.londogard.smile.extensions.StopWordFilter
+import com.londogard.smile.extensions.normalize
+import com.londogard.smile.extensions.words
 import java.util.*
 
 class NGram<T>(private val n: Int) {
@@ -24,3 +27,12 @@ class NGram<T>(private val n: Int) {
 
     fun getDictionary(): Set<T> = dictionary.toSet()
 }
+fun String.ngramNormalize(): Sequence<String> = this
+    .replace("<br/>", "\n")
+    .replace("</br>", "\n")
+    .replace("&quot;", "'")
+    .replace("</?\\w+/?>".toRegex(), "")
+    .toLowerCase()
+    .normalize()
+    .words(StopWordFilter.NONE)
+    .asSequence()

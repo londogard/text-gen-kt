@@ -2,9 +2,9 @@ package com.londogard.textgen
 
 
 enum class PretrainedModels(val path: String) {
-    SHAKESPEARE("/models/shakespeare.cobs"),
-    CARDS_AGAINST_WHITE("/models/cardsagainst_white.cobs"),
-    CARDS_AGAINST_BLACK("/models/cardsagainst_black.cobs"),
+    SHAKESPEARE("/models/shakespeare.cbor"),
+    CARDS_AGAINST_WHITE("/models/cardsagainst_white.cbor"),
+    CARDS_AGAINST_BLACK("/models/cardsagainst_black.cbor"),
     CUSTOM("/") // CUSTOM mode let's you train by file.
 }
 

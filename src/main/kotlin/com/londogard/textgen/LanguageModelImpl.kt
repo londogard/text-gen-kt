@@ -15,7 +15,7 @@ class LanguageModelImpl(
     private val logger = logger().value
 
     init {
-        model = NGramWordLM(0.3, emptyMap(), 5)
+        model = NGramWordLM(0.3, emptyMap(), n)
         when (pretrainedModels) {
             PretrainedModels.CUSTOM -> Unit
             else -> model.loadModel(getResourcePath(pretrainedModels.path))
@@ -29,7 +29,10 @@ class LanguageModelImpl(
     private fun getResourcePath(path: String): String = this::class.java.getResource(path).path
 
     override fun generateText(prefix: String, n: Int, temperature: Double): String {
-        return (1..n).fold(prefix) { acc, _ -> "$acc ${model.predictNext(acc)}" }
+        model.temperature = temperature
+        return (1..n)
+            .fold(prefix.ngramNormalize().toList()) { acc, _ -> acc + model.predictNext(acc) }
+            .fold("") { acc, itr -> if (itr.first().isLetterOrDigit()) "$acc $itr" else "$acc$itr" }
     }
 
     private fun Number.format(digits: Int) = "%.${digits}f".format(this)
@@ -47,9 +50,9 @@ class LanguageModelImpl(
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val model = LanguageModelImpl(PretrainedModels.CUSTOM, GenerationLevel.WORD, 15)
-            model.createCustomModel("/shakespeare.txt", "ngram_10.cbor", false)
-            println(model.generateText("", 150, 0.3))
+            val model = LanguageModelImpl(PretrainedModels.SHAKESPEARE, GenerationLevel.WORD, 10)
+            //model.createCustomModel("/cardsagainst_white.txt", "cardsagainst_white.cbor", false)
+            println(model.generateText("have a", 150, 0.1))
         }
     }
 }

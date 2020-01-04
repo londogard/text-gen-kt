@@ -9,12 +9,13 @@ import java.io.File
 
 @ImplicitReflectionSerializer
 abstract class BackendLM<T> {
-    private val mapSerializer = (String::class.serializer().list to Double::class.serializer()).map
+    private val mapStringSerializer = (String::class.serializer().list to Double::class.serializer()).map
+    private val mapCharSerializer = (Char::class.serializer().list to Double::class.serializer()).map
     private val cborSerializer = Cbor.plain
     private val padStart: Char = '\u0002'
     private val padEnd: Char = '\u0003'
     abstract var temperature: Double
-    protected abstract var internalLanguageModel: Map<List<String>, Double> // We want a Trie though...!
+    protected abstract var internalLanguageModel: Map<List<T>, Double>
     protected abstract val n: Int
     val padEndList = List(n) { padEnd.toString() }
     val padStartList = List(n) { padStart.toString() }
@@ -27,10 +28,10 @@ abstract class BackendLM<T> {
     abstract fun saveModel(path: String)
 
     protected fun serializeMapToFile(name: String, map: Map<List<String>, Double>): Unit = cborSerializer
-        .dump(mapSerializer, map)
+        .dump(mapStringSerializer, map)
         .let { File(name).writeBytes(it) }
 
     protected fun readSerializedMapFromFile(name: String): Map<List<String>, Double> = File(name)
         .readBytes()
-        .let { cborSerializer.load(mapSerializer, it) }
+        .let { cborSerializer.load(mapStringSerializer, it) }
 }
