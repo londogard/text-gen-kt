@@ -27,5 +27,8 @@ interface LanguageModel {
      * @param oneDocumentPerLine if true we'll treat each line as a document (i.e. pad around each line). If false it'll load the full file.
      */
     fun createCustomModel(path: String, name: String, oneDocumentPerLine: Boolean = false)
+
+    fun changeModelToCustom(path: String)
+    fun changeModelToPretrained(pretrainedModel: PretrainedModels)
 }
 

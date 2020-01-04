@@ -11,18 +11,18 @@ class LanguageModelImpl(
     override val generationLevel: GenerationLevel,
     override val n: Int = 10
 ) : LanguageModel {
-    private val model: BackendLM<String>
     private val logger = logger().value
+    private val model: BackendLM<String>
 
     init {
         model = NGramWordLM(n)
-        when (pretrainedModels) {
-            PretrainedModels.CUSTOM -> Unit
-            else -> model.loadModel(getResourcePath(pretrainedModels.path))
-        }
         when (generationLevel) {
             GenerationLevel.CHAR -> throw NotImplementedError("Word Generation is not implemented yet.")
             else -> Unit
+        }
+        when (pretrainedModels) {
+            PretrainedModels.CUSTOM -> Unit
+            else -> model.loadModel(getResourcePath(pretrainedModels.path))
         }
     }
 
@@ -46,12 +46,7 @@ class LanguageModelImpl(
         logger.info("Model saved as $name")
     }
 
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val model = LanguageModelImpl(PretrainedModels.CARDS_AGAINST_WHITE, GenerationLevel.WORD, 10)
-            //model.createCustomModel("/cardsagainst_white.txt", "cardsagainst_white.cbor", false)
-            println(model.generateText("have a", 150, 0.1))
-        }
-    }
+    override fun changeModelToCustom(path: String) = model.loadModel(path)
+
+    override fun changeModelToPretrained(pretrainedModel: PretrainedModels) = model.loadModel(pretrainedModel.path)
 }

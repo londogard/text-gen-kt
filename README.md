@@ -30,7 +30,7 @@ enum class PretrainedModels {
 }
 ```
 ##### GenerationLevel
-No pretrained models exist for `CHAR` currently.
+No pretrained models exist for `CHAR` currently. `CHAR` is not supported either.
 ```kotlin
 enum class GenerationLevel {
     WORD,
