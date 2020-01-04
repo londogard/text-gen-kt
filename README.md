@@ -1,7 +1,36 @@
-<a href='https://ko-fi.com/O5O819SEH' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi2.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+<a href='https://ko-fi.com/O5O819SEH' target='_blank'><img height='24' style='border:0px;height:24px;' src='https://az743702.vo.msecnd.net/cdn/kofi2.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>[![](https://jitpack.io/v/com.londogard/text-gen-kt.svg)](https://jitpack.io/#com.londogard/text-gen-kt)
 
 # text-gen-kt
 Text Generation in Kotlin. Will include multiple pre-trained models &amp; ability to train your own. Easy-to-use API as a goal too.
+
+## Installation
+### Jitpack (easiest)
+Add the following to your `build.gradle`. `$version` should be equal to the version supplied by tag above.
+```
+   repositories {
+        maven { url "https://jitpack.io" }
+   }
+   dependencies {
+         implementation 'com.londogard:text-gen-kt:$version'
+   }
+```
+### GitHub Packages
+Add the following to your `build.gradle`. `$version` (this one messed up, is 1.0-beta) should be equal to the version supplied by tag above.  
+The part with logging into github repository is how I understand that you need to login. If you know a better way please ping me in an issue.
+```
+repositories {
+   maven {
+     url = uri("https://maven.pkg.github.com/londogard/text-gen-kt")
+     credentials {
+         username = project.findProperty("gpr.user") ?: System.getenv("GH_USERNAME")
+         password = project.findProperty("gpr.key") ?: System.getenv("GH_TOKEN")
+     }
+}
+}
+dependencies {
+   implementation "com.londogard:summarize-kt:$version"
+}
+```
 
 ## [BETA] Usage
 OBS - usage might change in future as it's beta.  
