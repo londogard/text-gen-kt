@@ -21,7 +21,7 @@ plugins {
 
 
 group = "com.londogard"
-version = "1.0-beta"
+version = "1.0.1-beta"
 
 repositories {
     mavenCentral()

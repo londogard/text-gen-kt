@@ -7,12 +7,13 @@ import java.io.File
 
 @ImplicitReflectionSerializer
 abstract class BackendLM<T> {
-    protected abstract val mapSerializer: KSerializer<Map<List<T>, Double>>
-    private val mapCharSerializer = (Char::class.serializer().list to Double::class.serializer()).map
+    protected abstract val mapSerializer: KSerializer<Map<String, Map<T, Double>>>
+    protected val stringSerializer = String::class.serializer()
+    protected val doubleSerializer = Double::class.serializer()
     private val cborSerializer = Cbor.plain
     private val padStart: Char = '\u0002'
     private val padEnd: Char = '\u0003'
-    protected abstract var internalLanguageModel: Map<List<T>, Double>
+    protected abstract var internalLanguageModel: Map<String, Map<T, Double>> // Map<String, Map<T, Double>>
     protected abstract val n: Int
     val padEndList = List(n) { padEnd.toString() }
     val padStartList = List(n) { padStart.toString() }
@@ -26,15 +27,15 @@ abstract class BackendLM<T> {
 
     private fun getResource(path: String): InputStream = this::class.java.getResourceAsStream(path)
 
-    protected fun serializeMapToFile(name: String, map: Map<List<T>, Double>): Unit = cborSerializer
+    protected fun serializeMapToFile(name: String, map: Map<String, Map<T, Double>>): Unit = cborSerializer
         .dump(mapSerializer, map)
         .let { File(name).writeBytes(it) }
 
-    protected fun readSerializedMapFromFile(name: String): Map<List<T>, Double> = File(name)
+    protected fun readSerializedMapFromFile(name: String): Map<String, Map<T, Double>> = File(name)
         .readBytes()
         .let { cborSerializer.load(mapSerializer, it) }
 
-    protected fun readSerializedMapFromResource(name: String): Map<List<T>, Double> = getResource(name)
+    protected fun readSerializedMapFromResource(name: String): Map<String, Map<T, Double>> = getResource(name)
         .readBytes()
         .let { cborSerializer.load(mapSerializer, it) }
 }

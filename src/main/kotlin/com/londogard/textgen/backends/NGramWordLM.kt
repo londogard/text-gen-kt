@@ -4,16 +4,16 @@ import com.londogard.textgen.NGram
 import com.londogard.textgen.ngramNormalize
 import kotlinx.serialization.*
 import java.io.File
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.random.Random
 
 @ImplicitReflectionSerializer
 class NGramWordLM(
     override val n: Int,
-    override var internalLanguageModel: Map<List<String>, Double> = emptyMap(),
-    override val mapSerializer: KSerializer<Map<List<String>, Double>> = (String::class.serializer().list to Double::class.serializer()).map
-) :
-    BackendLM<String>() {
+    override var internalLanguageModel: Map<String, Map<String, Double>> = emptyMap()) : BackendLM<String>() {
+    private val stringDouble =  (stringSerializer to doubleSerializer).map
+    override val mapSerializer: KSerializer<Map<String, Map<String, Double>>> = (stringSerializer to stringDouble).map
 
     override fun predictNext(input: String, temperature: Double): String =
         TODO("Implement this, don't forget to not remove \n etc")
@@ -52,10 +52,19 @@ class NGramWordLM(
 
             val totalCount = internalModel.filterKeys { it.size == 1 }.values.sum()
 
-            internalLanguageModel = internalModel
+            val precomputedModel = internalModel
                 .mapValues { (key, value) ->
                     (value / (internalModel[key.dropLast(1)] ?: totalCount))
                 }
+
+            internalLanguageModel = precomputedModel
+                .entries
+                .groupBy( { it.key.dropLast(1).joinToString(" ") } , { it.key.last() to it.value })
+                .mapValues { it.value.toMap() }
+            //internalLanguageModel = internalModel
+            //    .mapValues { (key, value) ->
+            //        (0.4.pow(n - key.size)) * value / (internalModel[key.dropLast(1)] ?: totalCount)
+            //    }
 
             // TODO add Kneser-Ney Smooth
             //val discountByN = (1..n).map { i ->
@@ -71,17 +80,13 @@ class NGramWordLM(
 
     override fun predictNext(input: List<String>, temperature: Double): String {
         val history = input.takeLast(n - 1)
-        val options = (n downTo 1)
-            .asSequence()
-            .map { i ->
-                val discount = 0.4.pow(n.toDouble() - i)
+        val keys = (min(input.size, n) downTo 0).map {
+            input.takeLast(it).joinToString(" ")
+        }
 
-                internalLanguageModel
-                    .filterKeys { it.size == i && (it.size == 1 || it.take(i - 1) == history.takeLast(i - 1)) }
-                    .mapValues { it.value * discount }.entries
-            }
-            .map { it.sortedByDescending { l -> l.value } }
-            .flatten()
+        val options = keys.asSequence()
+            .mapNotNull { key -> internalLanguageModel[key]?.entries }
+            .flatMap { it.sortedByDescending { subEntry -> subEntry.value }.take(10).asSequence() }
             .take(10)
             .toList()
 
@@ -93,6 +98,6 @@ class NGramWordLM(
                 selection -= it.value
                 selection > 0
             }
-            .first().key.last()
+            .first().key
     }
 }
