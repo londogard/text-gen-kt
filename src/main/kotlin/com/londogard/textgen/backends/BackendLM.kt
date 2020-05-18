@@ -10,7 +10,7 @@ abstract class BackendLM<T> {
     protected abstract val mapSerializer: KSerializer<Map<String, Map<T, Double>>>
     protected val stringSerializer = String::class.serializer()
     protected val doubleSerializer = Double::class.serializer()
-    private val cborSerializer = Cbor.plain
+    private val cborSerializer = Cbor()
     private val padStart: Char = '\u0002'
     private val padEnd: Char = '\u0003'
     protected abstract var internalLanguageModel: Map<String, Map<T, Double>> // Map<String, Map<T, Double>>
@@ -25,6 +25,7 @@ abstract class BackendLM<T> {
     abstract fun loadModel(path: String, resource: Boolean = true)
     abstract fun saveModel(path: String)
 
+    @InternalSerializationApi
     private fun getResource(path: String): InputStream = this::class.java.getResourceAsStream(path)
 
     protected fun serializeMapToFile(name: String, map: Map<String, Map<T, Double>>): Unit = cborSerializer
@@ -35,6 +36,7 @@ abstract class BackendLM<T> {
         .readBytes()
         .let { cborSerializer.load(mapSerializer, it) }
 
+    @InternalSerializationApi
     protected fun readSerializedMapFromResource(name: String): Map<String, Map<T, Double>> = getResource(name)
         .readBytes()
         .let { cborSerializer.load(mapSerializer, it) }

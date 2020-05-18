@@ -1,8 +1,7 @@
 package com.londogard.textgen
 
-import com.londogard.smile.extensions.StopWordFilter
-import com.londogard.smile.extensions.normalize
-import com.londogard.smile.extensions.words
+import smile.nlp.normalize
+import smile.nlp.words
 import java.util.*
 
 class NGram<T>(private val n: Int) {
@@ -34,5 +33,5 @@ fun String.ngramNormalize(): Sequence<String> = this
     .replace("</?\\w+/?>".toRegex(), "")
     .toLowerCase()
     .normalize()
-    .words(StopWordFilter.NONE)
+    .words("none")
     .asSequence()

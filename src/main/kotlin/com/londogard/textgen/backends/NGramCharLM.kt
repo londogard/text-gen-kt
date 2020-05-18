@@ -1,8 +1,5 @@
 package com.londogard.textgen.backends
 
-import com.londogard.smile.extensions.StopWordFilter
-import com.londogard.smile.extensions.normalize
-import com.londogard.smile.extensions.words
 import com.londogard.textgen.NGram
 import kotlinx.serialization.ImplicitReflectionSerializer
 import java.io.File

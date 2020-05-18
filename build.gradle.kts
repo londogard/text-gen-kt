@@ -1,9 +1,12 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 buildscript {
-    val kotlin_version = "1.3.60"
+    val kotlin_version = "1.3.72"
     repositories {
         mavenCentral()
         jcenter()
     }
+
     dependencies {
         classpath(kotlin("gradle-plugin", kotlin_version))
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlin_version")
@@ -15,13 +18,14 @@ plugins {
     `maven-publish`
     id("org.jetbrains.dokka") version "0.10.0"
     id("com.github.ben-manes.versions") version "0.27.0"
-    id("org.jetbrains.kotlin.plugin.serialization") version ("1.3.60")
-    kotlin("jvm") version "1.3.60"
+    id("org.jetbrains.kotlin.plugin.serialization") version ("1.3.72")
+    kotlin("jvm") version "1.3.72"
 }
 
 
 group = "com.londogard"
-version = "1.0.1-beta"
+version = "1.0.2-beta"
+val smileVersion = "2.4.0"
 
 repositories {
     mavenCentral()
@@ -31,12 +35,15 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("com.londogard:smile-nlp-kt:1.0.1-beta")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
+
+    implementation("com.github.haifengl:smile-nlp:$smileVersion")
+    implementation("com.github.haifengl:smile-kotlin:$smileVersion")
+    
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:0.20.0")
 }
 
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
@@ -64,7 +71,7 @@ publishing {
         }
     }
     publications {
-        register<MavenPublication>("gpr"){
+        register<MavenPublication>("gpr") {
             from(components["java"])
         }
     }

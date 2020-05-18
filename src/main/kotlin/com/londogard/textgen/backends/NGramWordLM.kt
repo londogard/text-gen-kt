@@ -2,22 +2,25 @@ package com.londogard.textgen.backends
 
 import com.londogard.textgen.NGram
 import com.londogard.textgen.ngramNormalize
-import kotlinx.serialization.*
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.MapSerializer
 import java.io.File
 import kotlin.math.min
-import kotlin.math.pow
 import kotlin.random.Random
 
 @ImplicitReflectionSerializer
 class NGramWordLM(
     override val n: Int,
     override var internalLanguageModel: Map<String, Map<String, Double>> = emptyMap()) : BackendLM<String>() {
-    private val stringDouble =  (stringSerializer to doubleSerializer).map
-    override val mapSerializer: KSerializer<Map<String, Map<String, Double>>> = (stringSerializer to stringDouble).map
+    private val stringDouble =  MapSerializer(stringSerializer, doubleSerializer)
+    override val mapSerializer: KSerializer<Map<String, Map<String, Double>>> = MapSerializer(stringSerializer, stringDouble)
 
     override fun predictNext(input: String, temperature: Double): String =
         TODO("Implement this, don't forget to not remove \n etc")
 
+    @InternalSerializationApi
     override fun loadModel(path: String, resource: Boolean) {
         internalLanguageModel = if (resource) readSerializedMapFromResource(path) else readSerializedMapFromFile(path)
     }
@@ -79,7 +82,6 @@ class NGramWordLM(
     }
 
     override fun predictNext(input: List<String>, temperature: Double): String {
-        val history = input.takeLast(n - 1)
         val keys = (min(input.size, n) downTo 0).map {
             input.takeLast(it).joinToString(" ")
         }
