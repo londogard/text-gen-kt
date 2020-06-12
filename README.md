@@ -1,3 +1,5 @@
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/londogard/text-gen-kt)
+
 <a href='https://ko-fi.com/O5O819SEH' target='_blank'><img height='24' style='border:0px;height:24px;' src='https://az743702.vo.msecnd.net/cdn/kofi2.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>[![](https://jitpack.io/v/com.londogard/text-gen-kt.svg)](https://jitpack.io/#com.londogard/text-gen-kt)
 
 # text-gen-kt
