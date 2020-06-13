@@ -1,20 +1,4 @@
 /**
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
 # beam search
 def beam_search_decoder(data, k):
 	sequences = [[list(), 0.0]]
@@ -35,6 +19,9 @@ def beam_search_decoder(data, k):
 */
 class BeamSearch: Search {
     fun search(data: List<List<Double>>, beams: Int = 1): List<Int> {
-        val sequences = listOf(listOf() to 0.0) // format
+        val sequences = mutableListOf(listOf() to 0.0) // format
+        data.forEach {
+
+        }
     }
 }
