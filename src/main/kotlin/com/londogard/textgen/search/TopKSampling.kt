@@ -4,24 +4,12 @@ import kotlin.math.ln
 class BeamSearch: Search {
 
 	/**
-	 * Sampling (introduce randomness)
-	 * 	Pick the next word w_t according to the probability. Using Ngram probs
-	 * 	To improve this we want to keep high probs high and low lower. This is done through
-	 * 		editing the 'temperature' of the softmax. I.e. distribution is sharper!
-	 */
-
-	/**
-	 * TopK-Sampling
-	 * https://huggingface.co/blog/how-to-generate#top-k-sampling
-	 */
-
-	/**
 	 * n-grams, reduce % of same ngram appears twice (thrice etc). Simplest variant, %=0 if second time
 	 * 	Let's try it out by setting no_repeat_ngram_size=2
 	 * 	OBS:  An article generated about the city New York should not use a 2-gram penalty or otherwise,
 	 * 			the name of the city would only appear once in the whole text!
 	 *		  Requires a lot of fine-tuning..
-	 *
+	 *		  
 	 */
 	fun searchLazily(dataGeneration: (List<Int>) -> Float,
 					 beams: Int = 1,
