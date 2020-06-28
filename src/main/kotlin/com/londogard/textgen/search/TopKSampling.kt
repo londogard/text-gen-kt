@@ -1,7 +1,19 @@
 import com.londogard.textgen.search.Search
 import kotlin.math.ln
 
-class BeamSearch: Search {
+class TopKSampling {
+
+	/**
+	 * Sampling (introduce randomness)
+	 * 	Pick the next word w_t according to the probability. Using Ngram probs
+	 * 	To improve this we want to keep high probs high and low lower. This is done through
+	 * 		editing the 'temperature' of the softmax. I.e. distribution is sharper!
+	 */
+
+	/**
+	 * TopK-Sampling
+	 * 	https://huggingface.co/blog/how-to-generate#top-k-sampling
+	 */
 
 	/**
 	 * n-grams, reduce % of same ngram appears twice (thrice etc). Simplest variant, %=0 if second time

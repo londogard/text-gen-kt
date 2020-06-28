@@ -1,37 +1,58 @@
-import com.londogard.textgen.search.Search
+import kotlin.math.abs
 import kotlin.math.ln
+import kotlin.math.min
 
-class BeamSearch: Search {
+/**
+ * Setup:
+ * 	Vocab: Index to Token (Char/Word)
+ * 	SearchTechnique: Search
+ * 	Params: numWords etc
+ *
+ */
 
-	/**
-	 * Sampling (introduce randomness)
-	 * 	Pick the next word w_t according to the probability. Using Ngram probs
-	 * 	To improve this we want to keep high probs high and low lower. This is done through
-	 * 		editing the 'temperature' of the softmax. I.e. distribution is sharper!
-	 */
 
-	/**
-	 * TopK-Sampling
-	 * https://huggingface.co/blog/how-to-generate#top-k-sampling
-	 */
+/**	
+ * Interface should be extensible through LambdaFuncs or "Plugins" rather than flags.
+ * 		Flags works to begin with though...
+ */
 
-	/**
-	 * n-grams, reduce % of same ngram appears twice (thrice etc). Simplest variant, %=0 if second time
-	 * 	Let's try it out by setting no_repeat_ngram_size=2
-	 * 	OBS:  An article generated about the city New York should not use a 2-gram penalty or otherwise,
-	 * 			the name of the city would only appear once in the whole text!
-	 *		  Requires a lot of fine-tuning..
-	 *
-	 */
+// TODO
+//  	no-repeat; optimize that option
+// 		add exclusion (or let user know they need to do it!)
+fun ngramPenalty(tokens: List<Int>, n: Int = 2, penalty: Double=1.0): Double {
+	if (tokens.size <= n) return 0.0
+
+	val pen = min(abs(penalty), 1.0)
+	val ngram = tokens.takeLast(n)
+
+	return tokens	// TODO performance improvement by sliding over list rather than creating sublists
+		.dropLast(1)
+		.asSequence()
+		.windowed(n) // scan could prove heplful?
+		.count { it == ngram } * pen
+}
+
+class BeamSearch {
 	fun searchLazily(dataGeneration: (List<Int>) -> Float,
 					 beams: Int = 1,
 					 vocabSize: Int,
-					 earlyStopping: Boolean = true,
+					 // earlyStopping: Boolean = true, TODO add earlyStoppingSupport!
 					 maxTokens: Int = 50,
 					 numBeamsReturn: Int = beams): List<Pair<List<Int>, Float>> {
 		var sequences = listOf(listOf<Int>() to 0f)
-
-		TODO()
+		(0..maxTokens).forEach { _ ->
+			val allCadidates = mutableListOf<Pair<List<Int>, Float>>()
+			for (i in sequences.indices) {
+				val (seq, score) = sequences[i]
+				for (j in 0..vocabSize) {
+					val candidate = seq + listOf(j) to score - ln(dataGeneration(seq))
+					allCadidates.add(candidate)
+				}
+			}
+			allCadidates.sortBy { it.second }
+			sequences = allCadidates.take(beams)
+		}
+		return sequences.take(numBeamsReturn)
 	}
 
 	// Allow lazy generation or something like taht to generate next probs!
@@ -52,11 +73,8 @@ class BeamSearch: Search {
 		return sequences
     }
 }
-
-object a {
-
-
-
+/**
+object A {
 	@JvmStatic
 	fun main(args: Array<String>) {
 		val data = listOf(listOf(0.1, 0.2, 0.3, 0.4, 0.5),
@@ -76,4 +94,4 @@ object a {
 		 ([4, 0, 4, 0, 4, 0, 4, 0, 3, 0], 7.154615356913663)
 		 */
 	}
-}
+}**/
