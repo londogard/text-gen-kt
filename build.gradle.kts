@@ -26,6 +26,8 @@ plugins {
 group = "com.londogard"
 version = "1.0.2-beta"
 val smileVersion = "2.4.0"
+val ktestVersion = "1.3.0"
+val serializationVersion = "0.20.0"
 
 repositories {
     mavenCentral()
@@ -39,8 +41,12 @@ dependencies {
     implementation("com.github.haifengl:smile-nlp:$smileVersion")
     implementation("com.github.haifengl:smile-kotlin:$smileVersion")
     
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:0.20.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serializationVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$ktestVersion")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$ktestVersion")
+    testImplementation("org.amshove.kluent:kluent:1.61")
 }
 
 tasks.withType<KotlinCompile> {

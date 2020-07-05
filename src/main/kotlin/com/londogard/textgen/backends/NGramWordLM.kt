@@ -14,19 +14,19 @@ import kotlin.random.Random
 class NGramWordLM(
     override val n: Int,
     override var internalLanguageModel: Map<String, Map<String, Double>> = emptyMap()) : BackendLM<String>() {
-    private val stringDouble =  MapSerializer(stringSerializer, doubleSerializer)
-    override val mapSerializer: KSerializer<Map<String, Map<String, Double>>> = MapSerializer(stringSerializer, stringDouble)
+    //private val stringDouble =  MapSerializer(stringSerializer, doubleSerializer)
+    //override val mapSerializer: KSerializer<Map<String, Map<String, Double>>> = MapSerializer(stringSerializer, stringDouble)
 
     override fun predictNext(input: String, temperature: Double): String =
         TODO("Implement this, don't forget to not remove \n etc")
 
     @InternalSerializationApi
     override fun loadModel(path: String, resource: Boolean) {
-        internalLanguageModel = if (resource) readSerializedMapFromResource(path) else readSerializedMapFromFile(path)
+        TODO()
     }
 
     override fun saveModel(path: String) {
-        serializeMapToFile(path, internalLanguageModel)
+        TODO()
     }
 
     @ImplicitReflectionSerializer
