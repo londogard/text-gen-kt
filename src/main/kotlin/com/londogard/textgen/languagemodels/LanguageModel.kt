@@ -1,5 +1,6 @@
 package com.londogard.textgen.languagemodels
 
+import com.londogard.textgen.Config
 import com.londogard.textgen.NGram
 import smile.nlp.tokenizer.SimpleTokenizer
 import smile.nlp.tokenizer.Tokenizer
@@ -7,17 +8,25 @@ import kotlin.system.measureTimeMillis
 
 internal typealias InternalMutableLanguageModel = HashMap<List<Int>, MutableMap<Int, Double>>
 typealias InternalLanguageModel = Map<List<Int>, Map<Int, Double>>
+typealias InternalVocabulary = Map<Int, String>
 
-class LanguageModel2(private val tokenizer: Tokenizer = SimpleTokenizer(), val n: Int) {
+class LanguageModel(private val tokenizer: Tokenizer = SimpleTokenizer(), val n: Int) {
     private val dictionary: HashMap<Int, String> = hashMapOf()
     private val internalLanguageModel: InternalMutableLanguageModel = hashMapOf()
     private val defaultValue = 0.0
 
+    fun initByConfig(config: Config) {
+        dictionary.clear()
+        dictionary.putAll(config.vocab)
+        internalLanguageModel.clear()
+        internalLanguageModel.putAll(config.languageModel.mapValues { it.value.toMutableMap() })
+    }
     fun getDictionary(): Map<Int, String> = dictionary
     fun getReverseDictionary(): Map<String, Int> = dictionary.entries
         .associateBy({ it.value }) { it.key }
 
     fun getLanguageModel(): Map<List<Int>, Map<Int, Double>> = internalLanguageModel
+    fun getConfig(): Config = Config(n, getLanguageModel(), getDictionary())
 
     fun trainModel(documents: Sequence<String>) {
         val tokens = documents.flatMap { tokenizer.split(it).asSequence() } // perhaps just make it a var?
@@ -64,21 +73,6 @@ class LanguageModel2(private val tokenizer: Tokenizer = SimpleTokenizer(), val n
                 val allProbs = mMap.values.sum()
                 mMap.keys.forEach { key -> mMap[key] = mMap.getValue(key) / allProbs }
             }
-    }
-}
-
-object A {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        val lm = LanguageModel2(n = 3)
-        javaClass.getResourceAsStream("/shakespeare.txt").bufferedReader().useLines {
-            val text = it.joinToString("\n")
-            println(
-                measureTimeMillis { (1..5).forEach { lm.trainModel(sequenceOf(text)) } } / 1000.0 / 5
-            )
-            println(lm.getDictionary().entries.take(5))
-            println(lm.getLanguageModel().entries.take(3))
-        }
     }
 }
 /**

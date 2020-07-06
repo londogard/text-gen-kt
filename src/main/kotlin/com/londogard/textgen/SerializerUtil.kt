@@ -1,30 +1,34 @@
 package com.londogard.textgen
 
-import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.InternalSerializationApi
+import com.londogard.textgen.languagemodels.LanguageModel
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.cbor.Cbor
-import kotlinx.serialization.serializer
 import java.io.File
+import java.nio.file.Paths
 
-@ImplicitReflectionSerializer
 object SerializerUtil {
-    //private val mapSerializer<T>: KSerializer<Map<String, Map<T, Double>>>
-    // val mapSerializer: KSerializer<Map<List<Int>, Map<Int, Double>>>
-    private val stringSerializer = String::class.serializer()
-    private val doubleSerializer = Double::class.serializer()
+    // TODO add int -> short & double -> float possibilities to save space!
+    private val configSerializer: KSerializer<Config> = Config.serializer()
     private val cborSerializer = Cbor()
 
-    //protected fun serializeMapToFile(name: String, map: Map<String, Map<T, Double>>): Unit = cborSerializer
-    //    .dump(mapSerializer, map)
-    //    .let { File(name).writeBytes(it) }
-//
-    //protected fun readSerializedMapFromFile(name: String): Map<String, Map<T, Double>> = File(name)
-    //    .readBytes()
-    //    .let { cborSerializer.load(mapSerializer, it) }
-//
-    //@InternalSerializationApi
-    //protected fun readSerializedMapFromResource(name: String): Map<String, Map<T, Double>> = getResource(name)
-    //    .readBytes()
-    //    .let { cborSerializer.load(mapSerializer, it) }
+    fun serializeLanguageModel(pathToFolder: String, languageModel: LanguageModel) {
+        serializeConfig(Paths.get(pathToFolder, "config.cbor").toAbsolutePath().toString(), languageModel.getConfig())
+    }
+
+    fun readLanguageModel(pathToFolder: String): LanguageModel {
+        val config = deserializeConfigByAbsolutePath(Paths.get(pathToFolder, "config.cbor").toAbsolutePath().toString())
+        val lm = LanguageModel(n = config.n)
+        lm.initByConfig(config)
+        return lm
+    }
+
+    fun serializeConfig(path: String, config: Config): Unit = cborSerializer
+        .dump(configSerializer, config)
+        .let(File(path)::writeBytes)
+
+    fun deserializeConfig(data: ByteArray): Config = cborSerializer.load(configSerializer, data)
+    fun deserializeConfigByAbsolutePath(path: String): Config = deserializeConfig(File(path).readBytes())
+    internal fun deserializeConfigByResource(name: String): Config = javaClass.getResourceAsStream(name)
+        .readBytes()
+        .let(this::deserializeConfig)
 }

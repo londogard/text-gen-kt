@@ -1,13 +1,11 @@
 package com.londogard.textgen
 
-import com.londogard.textgen.languagemodels.LanguageModel2
+import com.londogard.textgen.languagemodels.LanguageModel
 import com.londogard.textgen.normalization.Normalization
 import com.londogard.textgen.normalization.SoftMaxNormalization
 import com.londogard.textgen.penalties.Penalty
 import com.londogard.textgen.predict.GreedyBackoff
 import com.londogard.textgen.predict.Smoothing
-import com.londogard.textgen.predict.StupidBackoff
-import com.londogard.textgen.search.BeamSearch
 import com.londogard.textgen.search.Search
 import com.londogard.textgen.search.TopKSampleSearch
 
@@ -21,7 +19,7 @@ object SimpleTextGeneration {
     fun generateText(numReturnSequences: Int = 3,
                      numTokens: Int = 50,
                      temperature: Double = 0.7,
-                     languageModel: LanguageModel2,
+                     languageModel: LanguageModel,
                      normalization: Normalization = SoftMaxNormalization(temperature),
                      searchTechnique: Search = TopKSampleSearch(10),    // TODO searchTechnique should allow 'probModifier'
                      penalties: List<Penalty> = emptyList(),
@@ -40,15 +38,24 @@ object SimpleTextGeneration {
     data class History(val history: List<Int>, val score: Double)
 }
 
+/**
+ * TODO
+ *  [ ] Add support for \n, \t etc
+ *  [ ] Add pre-trained models
+ *  [ ] Allow downloading of models (?)
+ *  [ ] Allow seed on random
+ *  [ ] Allow seed in form text for text-gen
+ *  [ ] Extract data
+ */
+
 object A {
     @JvmStatic
     fun main(args: Array<String>) {
-        val lm = LanguageModel2(n = 3)
-        javaClass.getResourceAsStream("/shakespeare.txt").bufferedReader().useLines {
-            val text = it.joinToString("\n")
-            lm.trainModel(sequenceOf(text))
-            val l = SimpleTextGeneration.generateText(languageModel = lm)
-            println(l.joinToString("\n"))
-        }
+        val lm = LanguageModel(n = 3)
+
+        val config = SerializerUtil.deserializeConfig(javaClass.getResourceAsStream("/models/lm.cbor").readBytes())
+
+        lm.initByConfig(config)
+        println(SimpleTextGeneration.generateText(languageModel = lm, numReturnSequences = 5).joinToString("\n"))
     }
 }

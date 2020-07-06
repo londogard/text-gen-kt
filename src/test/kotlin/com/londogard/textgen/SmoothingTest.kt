@@ -1,7 +1,7 @@
 package com.londogard.textgen
 
 import com.londogard.textgen.languagemodels.InternalLanguageModel
-import com.londogard.textgen.languagemodels.LanguageModel2
+import com.londogard.textgen.languagemodels.LanguageModel
 import com.londogard.textgen.predict.GreedyBackoff
 import com.londogard.textgen.predict.NoSmoothing
 import com.londogard.textgen.predict.StupidBackoff
@@ -12,7 +12,7 @@ import kotlin.test.Test
 
 class SmoothingTest {
     companion object {
-        private val languageModel = LanguageModel2(n = 3)
+        private val languageModel = LanguageModel(n = 3)
         lateinit var lm: InternalLanguageModel
         lateinit var reverseDict: Map<String, Int>
         @JvmStatic

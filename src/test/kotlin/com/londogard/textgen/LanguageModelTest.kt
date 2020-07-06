@@ -1,6 +1,6 @@
 package com.londogard.textgen
 
-import com.londogard.textgen.languagemodels.LanguageModel2
+import com.londogard.textgen.languagemodels.LanguageModel
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldContain
 import kotlin.test.Test
@@ -11,7 +11,7 @@ class LanguageModelTest {
 
     @Test
     fun makeModel() {
-        val languageModel = LanguageModel2(n = 3)
+        val languageModel = LanguageModel(n = 3)
         languageModel.trainModelMutable(testText)
         val dict = languageModel.getDictionary()
         val rd = languageModel.getReverseDictionary()
