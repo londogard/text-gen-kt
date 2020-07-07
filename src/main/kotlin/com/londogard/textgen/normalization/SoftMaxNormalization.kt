@@ -5,8 +5,9 @@ import kotlin.math.pow
 class SoftMaxNormalization(override val temperature: Double) : Normalization {
     override fun normalize(probabilities: List<Pair<Int, Double>>): List<Pair<Int, Double>> {
         val probs = probabilities.map { (_, score) -> score }.toDoubleArray()
+        val normalized = normalize(probs)
 
-        return probabilities.map { (index, _) -> index }.zip(normalize(probs).asList()) // TODO might be expensive to box
+        return List(probs.size) { i -> probabilities[i].first to normalized[i] }
     }
 
     override fun normalize(probabilities: DoubleArray): DoubleArray {

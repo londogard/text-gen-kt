@@ -1,38 +1,32 @@
 package com.londogard.textgen.predict
 
-import com.londogard.textgen.languagemodels.InternalLanguageModel
+import com.londogard.textgen.languagemodels.LanguageModel
+import com.londogard.textgen.languagemodels.LanguageModel.Companion.retrieveData
 import com.londogard.textgen.normalization.Normalization
 import com.londogard.textgen.normalization.SimpleNormalization
 import com.londogard.textgen.penalties.Penalty
-import kotlin.math.abs
-import kotlin.math.min
+import com.londogard.textgen.predict.Smoothing.Companion.takeP
 
 class NoSmoothing(
     override val normalizer: Normalization = SimpleNormalization(),
     override val penalties: List<Penalty> = emptyList()
 ) : Smoothing {
-    override fun predict(languageModel: InternalLanguageModel, history: List<Int>, token: Int): Double =
-        languageModel[history]?.get(token) ?: 0.0
+    override fun predict(languageModel: LanguageModel, history: List<Int>, token: Int): Double =
+        languageModel.getUnigramProbs().find { (key,_) -> key == token }?.second ?: 0.0
 
     override fun probabilitiesTopK(
-        languageModel: InternalLanguageModel,
+        languageModel: LanguageModel,
         history: List<Int>,
         k: Int
-    ): List<Pair<Int, Double>> = retrieveData(languageModel, history)
+    ): List<Pair<Int, Double>> = languageModel.retrieveData(history, penalties)
         .take(k)
         .let(normalizer::normalize)
 
     override fun probabilitiesTopP(
-        languageModel: InternalLanguageModel,
+        languageModel: LanguageModel,
         history: List<Int>,
         p: Double
-    ): List<Pair<Int, Double>> {
-        var normP = min(abs(p), 1.0)
-        return retrieveData(languageModel, history)
-            .takeWhile { (_, score) ->
-                normP -= score
-                (normP + score) >= 0
-            }
-            .let(normalizer::normalize)
-    }
+    ): List<Pair<Int, Double>> = languageModel.retrieveData(history, penalties)
+        .takeP(p)
+        .let(normalizer::normalize)
 }

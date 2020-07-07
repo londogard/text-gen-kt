@@ -1,6 +1,6 @@
 package com.londogard.textgen.search
 
-import com.londogard.textgen.languagemodels.InternalLanguageModel
+import com.londogard.textgen.languagemodels.LanguageModel
 import com.londogard.textgen.predict.Smoothing
 
 // TODO add step func?
@@ -9,7 +9,7 @@ interface Search {
     fun search(numReturnSequences: Int,
                numTokens: Int,
                ngram: Int,
-               languageModel: InternalLanguageModel,
+               languageModel: LanguageModel,
                smoothing: Smoothing
     ): List<List<Int>>
 }

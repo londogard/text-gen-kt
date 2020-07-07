@@ -8,6 +8,7 @@ import com.londogard.textgen.predict.GreedyBackoff
 import com.londogard.textgen.predict.Smoothing
 import com.londogard.textgen.search.Search
 import com.londogard.textgen.search.TopKSampleSearch
+import kotlin.system.measureTimeMillis
 
 // TODO might want to use float(s)!
 object SimpleTextGeneration {
@@ -27,11 +28,10 @@ object SimpleTextGeneration {
     ): List<String> {
 
         val history = mutableListOf(History(emptyList(), 0.0))
-        val lm = languageModel.getLanguageModel()
         val reverseDict = languageModel.getDictionary()
 
         return searchTechnique
-            .search(numReturnSequences, numTokens, languageModel.n, lm, smoothing)
+            .search(numReturnSequences, numTokens, languageModel.n, languageModel, smoothing)
             .map { it.map(reverseDict::get).joinToString(" ") }
     }
 
@@ -40,22 +40,27 @@ object SimpleTextGeneration {
 
 /**
  * TODO
- *  [ ] Add support for \n, \t etc
- *  [ ] Add pre-trained models
- *  [ ] Allow downloading of models (?)
- *  [ ] Allow seed on random
  *  [ ] Allow seed in form text for text-gen
- *  [ ] Extract data
+ *  [ ] Simplify Search
+ *  [ ] Search should make unigramAsSequence and apply penalty...!
+ *  [ ] Extract Smoothing Commons (at least internally on stupid/greddy backoff)
+ *  [ ] Add NgramPenalty
+ *  [ ] Add pre-trained models
+ *  [X] Add support for \n, \t etc
+ *  [-] Allow downloading of models (?)
+ *  [X] Allow seed on random
  */
 
 object A {
     @JvmStatic
     fun main(args: Array<String>) {
-        val lm = LanguageModel(n = 3)
+        val lm = LanguageModel(n = 7)
 
-        val config = SerializerUtil.deserializeConfig(javaClass.getResourceAsStream("/models/lm.cbor").readBytes())
+        javaClass.getResourceAsStream("/shakespeare.txt").bufferedReader().useLines { line ->
+            lm.trainModel(listOf(line.joinToString(" \n ")))
+        }
+        lm.serialize("lm.cbor")
 
-        lm.initByConfig(config)
-        println(SimpleTextGeneration.generateText(languageModel = lm, numReturnSequences = 5).joinToString("\n"))
+        println(SimpleTextGeneration.generateText(languageModel = lm, numReturnSequences = 5).joinToString("\n=====\n"))
     }
 }

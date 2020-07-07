@@ -1,81 +1,107 @@
 package com.londogard.textgen.languagemodels
 
 import com.londogard.textgen.Config
-import com.londogard.textgen.NGram
-import smile.nlp.tokenizer.SimpleTokenizer
+import com.londogard.textgen.penalties.Penalty
+import com.londogard.textgen.tokenizers.SimpleExtensibleTokenizer
+import com.londogard.textgen.utils.Sampling
+import com.londogard.textgen.utils.SerializerUtil
 import smile.nlp.tokenizer.Tokenizer
+import java.util.*
+import java.util.regex.Pattern
+import kotlin.collections.HashMap
+import kotlin.math.abs
 import kotlin.system.measureTimeMillis
 
-internal typealias InternalMutableLanguageModel = HashMap<List<Int>, MutableMap<Int, Double>>
-typealias InternalLanguageModel = Map<List<Int>, Map<Int, Double>>
+private typealias InternalMutableLanguageModel = HashMap<List<Int>, List<Pair<Int, Double>>>
+typealias InternalLanguageModel = Map<List<Int>, List<Pair<Int, Double>>>
 typealias InternalVocabulary = Map<Int, String>
+typealias Internal = Map<Int, String>
 
-class LanguageModel(private val tokenizer: Tokenizer = SimpleTokenizer(), val n: Int) {
+// TODO add int -> short & double -> float possibilities to save space!
+// TODO cache unigrams in map (top 500 + future uses)
+class LanguageModel(
+    private val tokenizer: Tokenizer = SimpleExtensibleTokenizer(whitespace = Pattern.compile(" ")),
+    val n: Int,
+    seed: Long? = null
+) {
     private val dictionary: HashMap<Int, String> = hashMapOf()
     private val internalLanguageModel: InternalMutableLanguageModel = hashMapOf()
-    private val defaultValue = 0.0
+    private val sortedUnigramProbs: MutableList<Pair<Int, Double>> = mutableListOf()
+
+    init {
+        if (seed != null) Sampling.setSeed(seed)
+    }
 
     fun initByConfig(config: Config) {
         dictionary.clear()
         dictionary.putAll(config.vocab)
         internalLanguageModel.clear()
-        internalLanguageModel.putAll(config.languageModel.mapValues { it.value.toMutableMap() })
+        internalLanguageModel.putAll(config.languageModel)
+        sortedUnigramProbs.addAll(config.unigram)
     }
+
     fun getDictionary(): Map<Int, String> = dictionary
-    fun getReverseDictionary(): Map<String, Int> = dictionary.entries
-        .associateBy({ it.value }) { it.key }
+    fun getReverseDictionary(): Map<String, Int> = dictionary.entries.associateBy({ it.value }) { it.key }
 
-    fun getLanguageModel(): Map<List<Int>, Map<Int, Double>> = internalLanguageModel
-    fun getConfig(): Config = Config(n, getLanguageModel(), getDictionary())
+    fun getUnigramProbs(): List<Pair<Int, Double>> = sortedUnigramProbs
+    fun getLanguageModel(): InternalLanguageModel = internalLanguageModel
+    fun getConfig(): Config = Config(n, getLanguageModel(), getDictionary(), sortedUnigramProbs)
+    fun serialize(absolutePath: String): Unit = SerializerUtil.serializeConfig(absolutePath, getConfig())
+    fun deserialize(absolutePath: String): Unit =
+        initByConfig(SerializerUtil.deserializeConfigByAbsolutePath(absolutePath))
 
-    fun trainModel(documents: Sequence<String>) {
-        val tokens = documents.flatMap { tokenizer.split(it).asSequence() } // perhaps just make it a var?
-        tokens.toHashSet().forEachIndexed { i, token -> dictionary[i] = token }
+    fun trainModel(documents: List<String>) {
+        dictionary.clear()
+        internalLanguageModel.clear()
+        val tokens = documents.flatMap { tokenizer.split(it).asList() } // perhaps just make it a var?
+        dictionary.putAll(tokens.toHashSet().let { it.indices.zip(it) })
         val reverseDict = getReverseDictionary()
         val tokensInt = tokens.mapNotNull(reverseDict::get)
-        for (i in 1..n) {
-            val subGramMap = tokensInt
-                .windowed(i)    // TODO perf improvement by not windowing but rather indexing!
-                .groupBy({ it.dropLast(1) }, { it.last() })
-                .mapValues { (_, value) ->
-                    val countMap = value.groupingBy { it }.eachCount()
+        val numTokens = tokensInt.size.toDouble()
+        val unigrams = tokensInt
+            .groupingBy { it }
+            .eachCount().entries
+            .map { (key, value) -> key to (value / numTokens) }
+            .sortedByDescending { it.second }
+        val ngramMap = tokensInt
+            .windowed(n) { window -> (2..n).map { i -> window.take(i) } }
+            .flatten()
+            .groupBy({ it.subList(0, it.size - 1) }, { it.last() })
+            .mapValues { (_, value) ->
+                val totalSize = value.size.toDouble()
 
-                    val total = countMap.values.sum().toDouble()
-                    countMap.mapValues { it.value / total }.toMutableMap()
-                }
-
-            internalLanguageModel.putAll(subGramMap)
+                value
+                    .groupingBy { it }
+                    .eachCount().entries
+                    .map { (key, value) -> key to (value / totalSize) }
+                    .sortedByDescending { it.second }
+            }
+        sortedUnigramProbs.addAll(unigrams)
+        internalLanguageModel.putAll(ngramMap)
+    }
+    /** Only to be used internally by */
+    companion object {
+        fun LanguageModel.retrieveData(
+            history: List<Int>,
+            penalties: List<Penalty>
+        ): List<Pair<Int, Double>> = when {
+            history.isNotEmpty() -> this.internalLanguageModel.getOrDefault(history, emptyList())
+                .let { entries -> penalties.fold(entries) { acc, penalty -> penalty.penalize(acc, history) } }
+                .filterNot { (_, score) -> score <= 0 }
+            else -> this.sortedUnigramProbs
         }
     }
+}
 
-    /** There is a little bug in this one it seems...*/
-    fun trainModelMutable(documents: Sequence<String>) {
-        val tokens = documents.flatMap { tokenizer.split(it).asSequence() }
-        val ngram = NGram<Int>(n)
-        tokens.toHashSet().forEachIndexed { i, token -> dictionary[i] = token }
-        val reverseDict = getReverseDictionary()
-        tokens
-            .mapNotNull(reverseDict::get)
-            .flatMap {
-                ngram.add(it)
-                if (ngram.count() == n) ngram.getAllNgrams().asSequence() // TODO make a sequence inside method!
-                else emptySequence()
-            }
-            .forEach { tokenNGram ->
-                val subGram = tokenNGram.dropLast(1)
-                internalLanguageModel
-                    .getOrPut(subGram) { mutableMapOf() }
-                    .apply { put(tokenNGram.last(), getOrDefault(tokenNGram.last(), defaultValue) + 1.0) }
-            }
-        internalLanguageModel
-            .values
-            .forEach { mMap ->
-                val allProbs = mMap.values.sum()
-                mMap.keys.forEach { key -> mMap[key] = mMap.getValue(key) / allProbs }
-            }
+object B {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val text = javaClass.getResourceAsStream("/shakespeare.txt").bufferedReader().readText()
+        val lm = LanguageModel(n = 3)
+        println(
+            measureTimeMillis {
+                (1..10).forEach { lm.trainModel(listOf(text)) }
+            } / 10.0
+        )
     }
 }
-/**
-[0=frowning, 1=Reserve, 2=busses, 3=Twenty, 4=Knocks]
-[[]={33339=8.456373734483583E-4, 217=1.7343895144885217E-4, 51=0.04367917909482505, 13548=1.1268632438767231E-4, 2379=0.0025878659365899353
- */
