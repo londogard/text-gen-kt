@@ -21,4 +21,17 @@ object Sampling {
     fun DoubleArray.topK(k: Int): List<Int> = sortedArrayDescending()
         .take(k) // TODO performance improvement
         .map(this::indexOf)
+
+    // Top-P Sampling (aka nucleus) Ari Holtzman et al. (2019) (https://arxiv.org/abs/1904.09751)
+    fun DoubleArray.topP(p: Double = 0.92): List<Int> {
+        val sorted = sortedArrayDescending()
+        var pAcc = 0.0
+
+        return sorted
+            .takeWhile { d ->
+                pAcc += d
+                pAcc <= p
+            }
+            .map(this::indexOf)
+    }
 }

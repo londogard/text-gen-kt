@@ -7,6 +7,10 @@ import kotlinx.serialization.cbor.Cbor
 import java.io.File
 import java.nio.file.Paths
 
+/**
+ * Serialization Util that simplifies the serialization of the model
+ * Makes use of kotlinx.serialization and serializes using CBOR (Compact Binary Object Representation).
+ */
 object SerializerUtil {
     private val configSerializer: KSerializer<Config> = Config.serializer()
 

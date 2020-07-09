@@ -5,10 +5,9 @@ import com.londogard.textgen.languagemodels.LanguageModel
 import com.londogard.textgen.predict.GreedyBackoff
 import com.londogard.textgen.predict.StupidBackoff
 import com.londogard.textgen.search.*
-import org.amshove.kluent.shouldContain
-import org.amshove.kluent.shouldHaveSize
-import org.amshove.kluent.shouldNotContain
+import org.amshove.kluent.*
 import org.junit.BeforeClass
+import smile.classification.rda
 import kotlin.test.Test
 
 class SearchTest {
@@ -77,5 +76,17 @@ class SearchTest {
         val text = topKSearch[0].joinToString(" ", transform = dict::getValue)
         topKSearch shouldHaveSize 3
         text shouldContain "I'd like to kick some ass tonight"
+    }
+
+    @Test
+    fun testTopKSeeedSearch() {
+        val search = TopKSampleSearch(7)
+        val seed = listOf("who", "do").mapNotNull(reverseDict::get)
+        val topKSearch = search.search(3, 50, 3, languageModel, StupidBackoff(), seed)
+
+        val text = topKSearch[0].joinToString(" ", transform = dict::getValue)
+        topKSearch shouldHaveSize 3
+        text shouldStartWith "who do"
+        topKSearch.forEach { tokens -> tokens.take(2) shouldBeEqualTo seed }
     }
 }

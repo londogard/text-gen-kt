@@ -4,6 +4,9 @@ import smile.nlp.normalize
 import smile.nlp.words
 import java.util.*
 
+/**
+ * NGram is a util that allows you to traverse a text extracting the ngrams.
+ */
 class NGram<T>(private val n: Int) {
     private val list = LinkedList<T>()
     private val dictionary =  mutableSetOf<T>()

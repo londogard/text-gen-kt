@@ -6,21 +6,17 @@ import com.londogard.textgen.tokenizers.SimpleExtensibleTokenizer
 import com.londogard.textgen.utils.Sampling
 import com.londogard.textgen.utils.SerializerUtil
 import smile.nlp.tokenizer.Tokenizer
-import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.HashMap
-import kotlin.math.abs
 import kotlin.system.measureTimeMillis
 
 private typealias InternalMutableLanguageModel = HashMap<List<Int>, List<Pair<Int, Double>>>
 typealias InternalLanguageModel = Map<List<Int>, List<Pair<Int, Double>>>
 typealias InternalVocabulary = Map<Int, String>
-typealias Internal = Map<Int, String>
 
 // TODO add int -> short & double -> float possibilities to save space!
 // TODO cache unigrams in map (top 500 + future uses)
 class LanguageModel(
-    private val tokenizer: Tokenizer = SimpleExtensibleTokenizer(whitespace = Pattern.compile(" ")),
+    val tokenizer: Tokenizer = SimpleExtensibleTokenizer(whitespace = Pattern.compile(" ")),
     val n: Int,
     seed: Long? = null
 ) {
@@ -79,8 +75,8 @@ class LanguageModel(
         sortedUnigramProbs.addAll(unigrams)
         internalLanguageModel.putAll(ngramMap)
     }
-    /** Only to be used internally by */
-    companion object {
+
+    internal companion object {
         fun LanguageModel.retrieveData(
             history: List<Int>,
             penalties: List<Penalty>

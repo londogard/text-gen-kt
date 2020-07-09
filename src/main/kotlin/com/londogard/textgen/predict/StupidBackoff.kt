@@ -71,6 +71,8 @@ class StupidBackoff(
         // TODO apply penalties both in this & stupidBackoff!
         languageModel.getUnigramProbs()
             .asSequence()
+            .map { prob -> penalties.fold(prob) { p, penalty -> penalty.penalize(listOf(p), history).first() } }
+            .filterNot { (_, score) -> score <= 0 }
             .map { (index, score) -> index to score * alpha.pow(history.size) }
             .takeWhile { (_, score) ->
                 totalScore += score

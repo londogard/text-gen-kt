@@ -4,6 +4,9 @@ import smile.nlp.tokenizer.Tokenizer
 import java.util.*
 import java.util.regex.Pattern
 
+/**
+ * A simple tokenizer which allows you to define your own whitespace to split upon.
+ */
 class SimpleExtensibleTokenizer(
     private val splitContraction: Boolean = false,
     private val whitespace: Pattern = WHITESPACE

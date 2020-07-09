@@ -40,6 +40,7 @@ class GreedyBackoff(
         languageModel
             .getUnigramProbs()
             .take(k - finalEntries.size)
+            .let { entries -> penalties.fold(entries) { items, penalty -> penalty.penalize(items, history) } }
             .let(finalEntries::addAll)
         return normalizer.normalize(finalEntries)
     }
@@ -63,7 +64,9 @@ class GreedyBackoff(
             if (totalScore >= fixedP) return normalizer.normalize(finalEntries)
         }
         languageModel
-            .getUnigramProbs()
+            .getUnigramProbs().asSequence()
+            .map { prob -> penalties.fold(prob) { p, penalty -> penalty.penalize(listOf(p), history).first() } }
+            .filterNot { (_, score) -> score <= 0 }
             .takeWhile { (_, score) ->
                 totalScore += score
                 (totalScore - score) < fixedP

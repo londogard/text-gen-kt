@@ -11,9 +11,10 @@ open class BeamSearch(private val beams: Int) : Search {
         numTokens: Int,
         ngram: Int,
         languageModel: LanguageModel,
-        smoothing: Smoothing
+        smoothing: Smoothing,
+        seed: List<Int>
     ): List<List<Int>> {
-        var sequences = listOf(emptyList<Int>() to 0.0)
+        var sequences = listOf(seed to 0.0)
         (0..numTokens).forEach { _ ->
             val allCandidates = mutableListOf<Pair<List<Int>, Double>>()
             for (i in sequences.indices) {

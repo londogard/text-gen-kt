@@ -12,39 +12,35 @@ import kotlin.system.measureTimeMillis
 
 // TODO might want to use float(s)!
 object SimpleTextGeneration {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        // generateText(3, 50, BeamSearch(3).search())
-
-    }
-    fun generateText(numReturnSequences: Int = 3,
-                     numTokens: Int = 50,
-                     temperature: Double = 0.7,
-                     languageModel: LanguageModel,
-                     normalization: Normalization = SoftMaxNormalization(temperature),
-                     searchTechnique: Search = TopKSampleSearch(10),    // TODO searchTechnique should allow 'probModifier'
-                     penalties: List<Penalty> = emptyList(),
-                     smoothing: Smoothing = GreedyBackoff(normalization, penalties)//StupidBackoff(normalizer = normalization, penalties = penalties)
+    fun generateText(
+        numReturnSequences: Int = 3,
+        numTokens: Int = 50,
+        temperature: Double = 0.7,
+        languageModel: LanguageModel,
+        normalization: Normalization = SoftMaxNormalization(temperature),
+        searchTechnique: Search = TopKSampleSearch(10),    // TODO searchTechnique should allow 'probModifier'
+        penalties: List<Penalty> = emptyList(),
+        smoothing: Smoothing = GreedyBackoff(normalization, penalties),
+        seed: String = ""//StupidBackoff(normalizer = normalization, penalties = penalties)
     ): List<String> {
 
-        val history = mutableListOf(History(emptyList(), 0.0))
         val reverseDict = languageModel.getDictionary()
+        val dict = languageModel.getReverseDictionary()
+        val history = languageModel.tokenizer.split(seed).mapNotNull(dict::get)
 
         return searchTechnique
-            .search(numReturnSequences, numTokens, languageModel.n, languageModel, smoothing)
+            .search(numReturnSequences, numTokens, languageModel.n, languageModel, smoothing, history)
             .map { it.map(reverseDict::get).joinToString(" ") }
     }
-
-    data class History(val history: List<Int>, val score: Double)
 }
 
 /**
  * TODO
- *  [ ] Allow seed in form text for text-gen
+ *  [X] Allow seed in form text for text-gen
  *  [ ] Simplify Search
- *  [ ] Search should make unigramAsSequence and apply penalty...!
- *  [ ] Extract Smoothing Commons (at least internally on stupid/greddy backoff)
- *  [ ] Add NgramPenalty
+ *  [X] Search should make unigramAsSequence and apply penalty...!
+ *  [X] Extract Smoothing Commons (at least internally on stupid/greddy backoff)
+ *  [X] Add NgramPenalty
  *  [ ] Add pre-trained models
  *  [X] Add support for \n, \t etc
  *  [-] Allow downloading of models (?)
