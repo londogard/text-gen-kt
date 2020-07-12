@@ -42,7 +42,6 @@ class SearchTest {
 
         val text = sampleSearch[0].joinToString(" ", transform = dict::getValue)
         sampleSearch shouldHaveSize 3
-        println(text)
         text shouldContain "I'd like to kick some ass tonight dear you !"
     }
 
@@ -54,7 +53,6 @@ class SearchTest {
         val text = beamSearch[0].joinToString(" ", transform = dict::getValue)
 
         beamSearch shouldHaveSize 3
-        println(text)
         text shouldContain "you think you're ? I'd like to kick some ass tonight dear"
     }
 
