@@ -139,5 +139,4 @@ might not want to generate the same ngram again? It's up to you!
 # TODOs
 
 - [ ] Allow Float / Short to decrease memory usage
-- [ ] Allow "pick only top choices" when training model
 - [ ] General improvements (continuous)

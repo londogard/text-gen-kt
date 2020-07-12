@@ -6,7 +6,9 @@ import com.londogard.textgen.tokenizers.SimpleExtensibleTokenizer
 import com.londogard.textgen.tokenizers.Tokenizer
 import com.londogard.textgen.utils.Sampling
 import com.londogard.textgen.utils.SerializerUtil
+import smile.nlp.normalize
 import java.util.regex.Pattern
+import kotlin.streams.asSequence
 
 typealias InternalLanguageModel = Map<List<Int>, List<Pair<Int, Double>>>
 typealias InternalUnigramModel = List<Pair<Int, Double>>
@@ -49,7 +51,8 @@ class LanguageModel(
         fun trainModel(
             documents: List<String>,
             n: Int,
-            tokenizer: Tokenizer = SimpleExtensibleTokenizer(whitespace = Pattern.compile(" "))
+            tokenizer: Tokenizer = SimpleExtensibleTokenizer(whitespace = Pattern.compile(" ")),
+            keepMinFreq: Int = 0 // 0 = at least one occurrence, 1 = at least two occurrences, etc... Applied to all ngrams
         ): LanguageModel {
             val tokens = documents.flatMap { tokenizer.split(it).asList() }
             val dictionary = tokens.toHashSet().let { uniqueTokens ->
@@ -61,6 +64,7 @@ class LanguageModel(
             val unigrams = tokensInt
                 .groupingBy { it }
                 .eachCount().entries
+                .filter { (_, occurrences) -> occurrences > keepMinFreq }
                 .map { (key, value) -> key to (value / numTokens) }
                 .sortedByDescending { it.second }
 
@@ -74,9 +78,11 @@ class LanguageModel(
                     value
                         .groupingBy { it }
                         .eachCount()
+                        .filter { (_, occurrences) -> occurrences > keepMinFreq }
                         .map { (key, value) -> key to (value / totalSize) }
                         .sortedByDescending { it.second }
                 }
+                .filter { (_, submap) -> submap.isNotEmpty() }
 
             return LanguageModel(tokenizer, Config(n, ngramMap, dictionary, unigrams))
         }
