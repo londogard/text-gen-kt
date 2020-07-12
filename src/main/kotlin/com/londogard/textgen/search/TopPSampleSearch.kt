@@ -2,7 +2,7 @@ package com.londogard.textgen.search
 
 import com.londogard.textgen.utils.Sampling.sample
 import com.londogard.textgen.languagemodels.LanguageModel
-import com.londogard.textgen.predict.Smoothing
+import com.londogard.textgen.smoothing.Smoothing
 
 open class TopPSampleSearch(private val p: Double) : Search {
     override fun search(
@@ -18,7 +18,7 @@ open class TopPSampleSearch(private val p: Double) : Search {
                 returnSequence + listOf((1..numTokens)
                     .fold(seed) { history, _ ->
                         history + listOf(
-                            sample(smoothing.probabilitiesTopP(languageModel, history.takeLast(ngram), p))
+                            sample(smoothing.probabilitiesTopP(languageModel, history, p))
                         )
                     })
             }

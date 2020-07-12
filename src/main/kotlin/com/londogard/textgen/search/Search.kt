@@ -1,16 +1,19 @@
 package com.londogard.textgen.search
 
 import com.londogard.textgen.languagemodels.LanguageModel
-import com.londogard.textgen.predict.Smoothing
+import com.londogard.textgen.smoothing.Smoothing
 
-// TODO add step func?
 interface Search {
-    fun search(numReturnSequences: Int,
-               numTokens: Int,
-               ngram: Int,
-               languageModel: LanguageModel,
-               smoothing: Smoothing,
-               // earlyStopping = false <-- TODO
-               seed: List<Int> = emptyList()
+    /**
+     * Searches the Language Model for the numReturnSequences, with numTokens in each, best choices given configuration.
+     */
+    fun search(
+        numReturnSequences: Int,
+        numTokens: Int,
+        ngram: Int,
+        languageModel: LanguageModel,
+        smoothing: Smoothing,
+        // earlyStopping = false <-- TODO
+        seed: List<Int> = emptyList()
     ): List<List<Int>>
 }

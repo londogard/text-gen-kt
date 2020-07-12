@@ -1,6 +1,5 @@
 package com.londogard.textgen.tokenizers
 
-import smile.nlp.tokenizer.Tokenizer
 import java.util.*
 import java.util.regex.Pattern
 
@@ -11,8 +10,8 @@ class SimpleExtensibleTokenizer(
     private val splitContraction: Boolean = false,
     private val whitespace: Pattern = WHITESPACE
     ) : Tokenizer {
-    override fun split(text: String?): Array<String> {
-        var updatedText = text ?: return emptyArray()
+    override fun split(text: String): Array<String> {
+        var updatedText = text
         if (splitContraction) {
             updatedText = WONT_CONTRACTION.matcher(updatedText).replaceAll("$1ill not")
             updatedText = SHANT_CONTRACTION.matcher(updatedText).replaceAll("$1ll not")

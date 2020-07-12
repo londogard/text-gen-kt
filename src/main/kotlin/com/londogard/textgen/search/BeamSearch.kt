@@ -1,7 +1,7 @@
 package com.londogard.textgen.search
 
 import com.londogard.textgen.languagemodels.LanguageModel
-import com.londogard.textgen.predict.Smoothing
+import com.londogard.textgen.smoothing.Smoothing
 import kotlin.math.ln
 
 /** Perhaps a step function would make sense? */
@@ -20,7 +20,7 @@ open class BeamSearch(private val beams: Int) : Search {
             for (i in sequences.indices) {
                 val (seq, score) = sequences[i]
                 val probs = smoothing
-                    .probabilitiesTopK(languageModel, seq.takeLast(ngram), beams)
+                    .probabilitiesTopK(languageModel, seq, beams)
                     .map { (index, prob) -> seq + listOf(index) to score - ln(prob) }
 
                 allCandidates.addAll(probs)

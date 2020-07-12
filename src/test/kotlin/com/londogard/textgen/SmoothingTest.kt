@@ -1,10 +1,9 @@
 package com.londogard.textgen
 
-import com.londogard.textgen.languagemodels.InternalLanguageModel
 import com.londogard.textgen.languagemodels.LanguageModel
-import com.londogard.textgen.predict.GreedyBackoff
-import com.londogard.textgen.predict.NoSmoothing
-import com.londogard.textgen.predict.StupidBackoff
+import com.londogard.textgen.smoothing.GreedyBackoff
+import com.londogard.textgen.smoothing.NoSmoothing
+import com.londogard.textgen.smoothing.StupidBackoff
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldHaveSize
 import org.junit.BeforeClass
@@ -12,13 +11,13 @@ import kotlin.test.Test
 
 class SmoothingTest {
     companion object {
-        private val languageModel = LanguageModel(n = 3)
+        lateinit var languageModel: LanguageModel
         lateinit var reverseDict: Map<String, Int>
         @JvmStatic
         @BeforeClass
         fun setup() {
             val testText = listOf("Hello dear, who do you think you're? I'd like to kick some ass tonight dear you!")
-            languageModel.trainModel(testText)
+            languageModel = LanguageModel.trainModel(testText, n = 3)
             reverseDict = languageModel.getReverseDictionary()
         }
     }

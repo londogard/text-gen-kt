@@ -2,7 +2,7 @@ package com.londogard.textgen.search
 
 import com.londogard.textgen.utils.Sampling.sample
 import com.londogard.textgen.languagemodels.LanguageModel
-import com.londogard.textgen.predict.Smoothing
+import com.londogard.textgen.smoothing.Smoothing
 
 class TopKSampleSearch(private val k: Int) : Search {
     override fun search(
@@ -16,7 +16,7 @@ class TopKSampleSearch(private val k: Int) : Search {
         return (1..numReturnSequences)
             .fold(emptyList()) { returnSequence, _ ->
                 returnSequence + listOf((1..numTokens).fold(seed) { history, _ ->
-                    history + listOf(sample(smoothing.probabilitiesTopK(languageModel, history.takeLast(ngram), k)))
+                    history + listOf(sample(smoothing.probabilitiesTopK(languageModel, history, k)))
                 })
             }
     }
