@@ -71,12 +71,12 @@ class SimpleExtensibleTokenizer(
             Pattern.compile("(?i)\\b(Wha)(t)(cha)\\b")
         )
         private val DELIMITERS: Array<Pattern> =
-            arrayOf( // Separate most punctuation
-                Pattern.compile("((?U)[^\\w\\.\\'\\-\\/,&])"),  // Separate commas if they're followed by space (e.g., don't separate 2,500)
-                Pattern.compile("(?U)(,\\s)"),  // Separate single quotes if they're followed by a space.
-                Pattern.compile("(?U)('\\s)"),  // Separate periods that come before newline or end of string.
-                Pattern.compile("(?U)\\. *(\\n|$)"),  // Separate continuous periods such as ... in ToC.
-                Pattern.compile("(?U)(\\.{3,})")
+            arrayOf(
+                Pattern.compile("((?U)[^\\w\\.\\'\\-\\/,&<>])"),  // Separate most punctuation
+                Pattern.compile("(?U)(,\\s)"),  // Separate commas if they're followed by space (e.g., don't separate 2,500)
+                Pattern.compile("(?U)('\\s)"),  // Separate single quotes if they're followed by a space.
+                Pattern.compile("(?U)\\. *(\\n|$)"),  // Separate periods that come before newline or end of string.
+                Pattern.compile("(?U)(\\.{3,})")  // Separate continuous periods such as ... in ToC.
             )
         private val WHITESPACE: Pattern = Pattern.compile("(?U)\\s+")
     }

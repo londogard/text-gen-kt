@@ -54,14 +54,15 @@ class LanguageModel(
             tokenizer: Tokenizer = SimpleExtensibleTokenizer(whitespace = Pattern.compile(" ")),
             keepMinFreq: Int = 0 // 0 = at least one occurrence, 1 = at least two occurrences, etc... Applied to all ngrams
         ): LanguageModel {
-            val tokens = documents.flatMap { tokenizer.split(it).asList() }
-            val dictionary = tokens.toHashSet().let { uniqueTokens ->
+            val tokens = documents.map { tokenizer.split(it).asList() }
+            val dictionary = tokens.flatten().toHashSet().let { uniqueTokens ->
                 HashMap<Int, String>(uniqueTokens.size).apply { putAll(uniqueTokens.indices.zip(uniqueTokens)) }
             }
             val reverseDict = dictionary.entries.associateBy({ it.value }) { it.key }
-            val tokensInt = tokens.mapNotNull(reverseDict::get)
-            val numTokens = tokensInt.size.toDouble()
+            val tokensInt = tokens.map { docTokens -> docTokens.mapNotNull(reverseDict::get) }
+            val numTokens = tokens.sumByDouble { it.size.toDouble() }
             val unigrams = tokensInt
+                .flatten()
                 .groupingBy { it }
                 .eachCount().entries
                 .filter { (_, occurrences) -> occurrences > keepMinFreq }
@@ -69,8 +70,11 @@ class LanguageModel(
                 .sortedByDescending { it.second }
 
             val ngramMap = tokensInt
-                .windowed(n) { window -> (2..n).map { i -> window.take(i) } }
-                .flatten()
+                .flatMap { docTokens ->
+                    docTokens
+                        .windowed(n) { window -> (2..n).map { i -> window.take(i) } }
+                        .flatten()
+                }
                 .groupBy({ it.subList(0, it.size - 1) }) { it.last() }
                 .mapValues { (_, value) ->
                     val totalSize = value.size.toDouble()
@@ -84,27 +88,27 @@ class LanguageModel(
                 }
                 .filter { (_, submap) -> submap.isNotEmpty() }
 
-            return LanguageModel(tokenizer, Config(n, ngramMap, dictionary, unigrams))
-        }
-
-        internal fun LanguageModel.retrieveNgramData(
-            history: List<Int>,
-            penalties: List<Penalty>,
-            n: Int
-        ): List<Pair<Int, Double>> = when {
-            history.isNotEmpty() -> this.internalLanguageModel
-                .getOrDefault(history.takeLast(n), emptyList())
-                .let { entries -> penalties.fold(entries) { acc, penalty -> penalty.penalize(acc, history) } }
-                .filterNot { (_, score) -> score <= 0 }
-            else -> this.sortedUnigramProbabilities
-        }
-
-        internal fun LanguageModel.retrieveUnigramData(
-            history: List<Int>,
-            penalties: List<Penalty>
-        ): Sequence<Pair<Int, Double>> =
-            this.sortedUnigramProbabilities.asSequence()
-                .map { prob -> penalties.fold(prob) { p, penalty -> penalty.penalize(listOf(p), history).first() } }
-                .filterNot { (_, score) -> score <= 0 }
+        return LanguageModel(tokenizer, Config(n, ngramMap, dictionary, unigrams))
     }
+
+    internal fun LanguageModel.retrieveNgramData(
+        history: List<Int>,
+        penalties: List<Penalty>,
+        n: Int
+    ): List<Pair<Int, Double>> = when {
+        history.isNotEmpty() -> this.internalLanguageModel
+            .getOrDefault(history.takeLast(n), emptyList())
+            .let { entries -> penalties.fold(entries) { acc, penalty -> penalty.penalize(acc, history) } }
+            .filterNot { (_, score) -> score <= 0 }
+        else -> this.sortedUnigramProbabilities
+    }
+
+    internal fun LanguageModel.retrieveUnigramData(
+        history: List<Int>,
+        penalties: List<Penalty>
+    ): Sequence<Pair<Int, Double>> =
+        this.sortedUnigramProbabilities.asSequence()
+            .map { prob -> penalties.fold(prob) { p, penalty -> penalty.penalize(listOf(p), history).first() } }
+            .filterNot { (_, score) -> score <= 0 }
+}
 }

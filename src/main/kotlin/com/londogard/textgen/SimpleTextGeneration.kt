@@ -8,6 +8,11 @@ import com.londogard.textgen.smoothing.GreedyBackoff
 import com.londogard.textgen.smoothing.Smoothing
 import com.londogard.textgen.search.Search
 import com.londogard.textgen.search.TopKSampleSearch
+import com.londogard.textgen.utils.PadUtil
+import smile.nlp.normalize
+import java.io.File
+import java.nio.file.Paths
+import kotlin.streams.toList
 
 
 object SimpleTextGeneration {
@@ -22,7 +27,6 @@ object SimpleTextGeneration {
         smoothing: Smoothing = GreedyBackoff(normalization, penalties),
         seed: String = ""
     ): List<String> {
-
         val reverseDict = languageModel.dictionary
         val dict = languageModel.getReverseDictionary()
         val history = languageModel.tokenizer.split(seed).mapNotNull(dict::get)
