@@ -5,7 +5,7 @@ import kotlin.math.exp
 /**
  * Softmax with temperature as defined in Ari Holtzman et al. (2019) - https://arxiv.org/pdf/1904.09751.pdf (ch. 3.3)
  */
-class SoftMaxNormalization(override val temperature: Double) : Normalization {
+class SoftmaxNormalization(override val temperature: Double) : Normalization {
     override fun normalize(probabilities: List<Pair<Int, Double>>): List<Pair<Int, Double>> {
         val probs = probabilities.map { (_, score) -> score }.toDoubleArray()
         val normalized = normalize(probs)

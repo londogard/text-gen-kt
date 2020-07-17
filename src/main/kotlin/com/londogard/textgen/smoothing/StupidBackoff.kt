@@ -3,8 +3,9 @@ package com.londogard.textgen.smoothing
 import com.londogard.textgen.languagemodels.LanguageModel
 import com.londogard.textgen.languagemodels.LanguageModel.Companion.retrieveNgramData
 import com.londogard.textgen.languagemodels.LanguageModel.Companion.retrieveUnigramData
+import com.londogard.textgen.normalization.LondogardNormalization
 import com.londogard.textgen.normalization.Normalization
-import com.londogard.textgen.normalization.SoftMaxNormalization
+import com.londogard.textgen.normalization.SoftmaxNormalization
 import com.londogard.textgen.penalties.Penalty
 import kotlin.math.abs
 import kotlin.math.min
@@ -12,7 +13,7 @@ import kotlin.math.pow
 
 class StupidBackoff(
     var alpha: Double = 0.4,
-    override val normalizer: Normalization = SoftMaxNormalization(0.7),
+    override val normalizer: Normalization = LondogardNormalization(0.7),
     override val penalties: List<Penalty> = emptyList()
 ) : Smoothing {
     override fun predict(languageModel: LanguageModel, history: List<Int>, token: Int): Double {

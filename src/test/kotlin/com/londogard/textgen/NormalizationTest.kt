@@ -1,15 +1,16 @@
 package com.londogard.textgen
 
+import com.londogard.textgen.normalization.LondogardNormalization
 import com.londogard.textgen.normalization.SimpleNormalization
-import com.londogard.textgen.normalization.SoftMaxNormalization
+import com.londogard.textgen.normalization.SoftmaxNormalization
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInRange
 import kotlin.test.Test
 
 class NormalizationTest {
     @Test
-    fun testSoftMax() {
-        val normalizer = SoftMaxNormalization(0.8)
+    fun testLondogard() {
+        val normalizer = LondogardNormalization(0.8)
         val normalized = normalizer.normalize(listOf(1 to 0.5, 2 to 0.4, 3 to 0.1))
 
         normalized[0].second shouldBeInRange 0.75..0.76
@@ -18,8 +19,8 @@ class NormalizationTest {
     }
 
     @Test
-    fun testSoftMaxZeroTemp() {
-        val normalizer = SoftMaxNormalization(0.0)
+    fun testLondogardZeroTemp() {
+        val normalizer = LondogardNormalization(0.0)
         val normalized = normalizer.normalize(listOf(1 to 0.5, 2 to 0.4, 3 to 0.1))
 
         normalized[0].second shouldBeEqualTo 0.5
@@ -27,8 +28,8 @@ class NormalizationTest {
         normalized[2].second shouldBeEqualTo 0.1
     }
     @Test
-    fun testSoftMaxZeroTempAbove100percent() {
-        val normalizer = SoftMaxNormalization(0.0)
+    fun testLondogardZeroTempAbove100percent() {
+        val normalizer = LondogardNormalization(0.0)
         val normalized = normalizer.normalize(listOf(1 to 5.0, 2 to 4.0, 3 to 1.0))
 
         normalized[0].second shouldBeEqualTo 0.5
@@ -56,4 +57,10 @@ class NormalizationTest {
         normalized[2].second shouldBeEqualTo 0.1
     }
 
+    @Test
+    fun testSoftmaxNormalization() {
+        val normalizer = SoftmaxNormalization(1.0)
+        val normalized = normalizer.normalize(doubleArrayOf(3.0, 1.0, 0.2))
+        normalized shouldBeEqualTo doubleArrayOf(0.8360188027814407, 0.11314284146556011, 0.05083835575299916)
+    }
 }
