@@ -12,11 +12,11 @@ class LanguageModelTest {
 
     @Test
     fun makeModel() {
-        val languageModel = LanguageModel.trainModel(testText, n = 3)
+        val languageModel = LanguageModel.fit(testText, n = 3)
         val dict = languageModel.dictionary
         val rd = languageModel.getReverseDictionary()
         val lm = languageModel.getLanguageModel()
-        val unigramLm = languageModel.sortedUnigramProbabilities.toMap()
+        val unigramLm = languageModel.internalLanguageModel[emptyList()]?.toMap() ?: emptyMap()
 
         dict.values.toSet() shouldContain "Hello"
         unigramLm[rd["Hello"]] shouldNotBe null

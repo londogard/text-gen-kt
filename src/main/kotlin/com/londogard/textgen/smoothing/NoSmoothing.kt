@@ -12,7 +12,7 @@ class NoSmoothing(
     override val penalties: List<Penalty> = emptyList()
 ) : Smoothing {
     override fun predict(languageModel: LanguageModel, history: List<Int>, token: Int): Double =
-        languageModel.sortedUnigramProbabilities.find { (key,_) -> key == token }?.second ?: 0.0
+        languageModel.internalLanguageModel[emptyList()]?.find { (key,_) -> key == token }?.second ?: 0.0
 
     override fun probabilitiesTopK(
         languageModel: LanguageModel,

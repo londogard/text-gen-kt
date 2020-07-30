@@ -1,6 +1,5 @@
 package com.londogard.textgen.penalties
 
-import smile.nlp.ngram
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -10,11 +9,10 @@ fun ngramPenalty(tokens: List<Int>, n: Int = 2, penalty: Double = 1.0): Double {
     val pen = min(abs(penalty), 1.0)
     val ngram = tokens.takeLast(n)
 
-    return tokens    // TODO performance improvement by sliding over list rather than creating sublists
+    return tokens
         .dropLast(1)
-        .asSequence()
-        .windowed(n)
-        .count { it == ngram } * pen
+        .windowed(n) { if (it == ngram) 1 else 0 }
+        .sum() * pen
 }
 
 // penalty = 0.2, loose 80 % of probability (i.e. keep 20%)

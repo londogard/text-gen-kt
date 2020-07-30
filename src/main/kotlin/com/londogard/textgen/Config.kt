@@ -7,5 +7,4 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Config(val n: Int,
                   val languageModel: InternalLanguageModel,
-                  val vocab: InternalVocabulary,
-                  val unigram: List<Pair<Int, Double>>)
+                  val vocab: InternalVocabulary)

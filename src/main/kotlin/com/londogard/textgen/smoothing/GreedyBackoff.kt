@@ -2,7 +2,6 @@ package com.londogard.textgen.smoothing
 
 import com.londogard.textgen.languagemodels.LanguageModel
 import com.londogard.textgen.languagemodels.LanguageModel.Companion.retrieveNgramData
-import com.londogard.textgen.languagemodels.LanguageModel.Companion.retrieveUnigramData
 import com.londogard.textgen.normalization.Normalization
 import com.londogard.textgen.normalization.SimpleNormalization
 import com.londogard.textgen.penalties.Penalty
@@ -14,7 +13,7 @@ class GreedyBackoff(
     override val penalties: List<Penalty> = emptyList()
 ) : Smoothing {
     override fun predict(languageModel: LanguageModel, history: List<Int>, token: Int): Double {
-        val range = if (history.isEmpty()) IntRange.EMPTY else min(languageModel.n - 1, history.size) downTo 1
+        val range = min(languageModel.n, history.size) downTo 0
         for (i in range) {
             val tmpProb = languageModel
                 .retrieveNgramData(history, emptyList(), i)
@@ -23,7 +22,7 @@ class GreedyBackoff(
             if (tmpProb != null) return tmpProb
         }
 
-        return languageModel.sortedUnigramProbabilities.find { (key, _) -> key == token }?.second ?: 0.0
+        return languageModel.internalLanguageModel[emptyList()]?.find { (key, _) -> key == token }?.second ?: 0.0
     }
 
     override fun probabilitiesTopK(
@@ -32,7 +31,7 @@ class GreedyBackoff(
         k: Int
     ): List<Pair<Int, Double>> {
         val finalEntries: MutableList<Pair<Int, Double>> = mutableListOf()
-        val range = if (history.isEmpty()) IntRange.EMPTY else min(languageModel.n - 1, history.size) downTo 1
+        val range = min(languageModel.n, history.size) downTo 0
         for (i in range) {
             languageModel
                 .retrieveNgramData(history, penalties, i)
@@ -41,10 +40,6 @@ class GreedyBackoff(
 
             if (finalEntries.size == k) return normalizer.normalize(finalEntries)
         }
-        languageModel
-            .retrieveUnigramData(history, penalties)
-            .take(k - finalEntries.size)
-            .let(finalEntries::addAll)
 
         return normalizer.normalize(finalEntries)
     }
@@ -57,9 +52,10 @@ class GreedyBackoff(
         val fixedP = min(abs(p), 1.0)
         val finalEntries: MutableList<Pair<Int, Double>> = mutableListOf()
         var totalScore = 0.0
-        val range = if (history.isEmpty()) IntRange.EMPTY else min(languageModel.n - 1, history.size) downTo 1
+        val range = min(languageModel.n, history.size) downTo 0
         for (i in range) {
-            languageModel.retrieveNgramData(history, penalties, i)
+            languageModel
+                .retrieveNgramData(history, penalties, i)
                 .takeWhile { (_, score) ->
                     totalScore += score
                     (totalScore - score) < fixedP
@@ -68,14 +64,6 @@ class GreedyBackoff(
 
             if (totalScore >= fixedP) return normalizer.normalize(finalEntries)
         }
-        languageModel
-            .retrieveUnigramData(history, penalties)
-            .filterNot { (_, score) -> score <= 0 }
-            .takeWhile { (_, score) ->
-                totalScore += score
-                (totalScore - score) < fixedP
-            }.let(finalEntries::addAll)
-
 
         return normalizer.normalize(finalEntries)
     }

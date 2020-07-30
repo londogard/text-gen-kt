@@ -4,7 +4,6 @@ import com.londogard.textgen.languagemodels.LanguageModel
 import com.londogard.textgen.smoothing.GreedyBackoff
 import com.londogard.textgen.smoothing.StupidBackoff
 import com.londogard.textgen.search.*
-import com.londogard.textgen.utils.Sampling
 import org.amshove.kluent.*
 import org.junit.BeforeClass
 import kotlin.test.Test
@@ -19,7 +18,7 @@ class SearchTest {
         fun setup() {
             val testText = listOf("Hello dear, who do you think you're? I'd like to kick some ass tonight dear you!")
             //Sampling.setSeed(42)
-            languageModel = LanguageModel.trainModel(testText, n = 3)
+            languageModel = LanguageModel.fit(testText, n = 3)
             reverseDict = languageModel.getReverseDictionary()
             dict = languageModel.dictionary
         }
