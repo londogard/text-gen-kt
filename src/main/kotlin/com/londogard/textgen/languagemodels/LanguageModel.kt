@@ -94,18 +94,5 @@ class LanguageModel(
             .getOrDefault(history.takeLast(n), emptyList())
             .let { entries -> penalties.fold(entries) { acc, penalty -> penalty.penalize(acc, history) } }
             .filterNot { (_, score) -> score <= 0 }
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val text = File("/home/londet/git/text-gen-kt/files/cardsagainst_white.txt").readLines()
-            val data = if (false) listOf(text.joinToString(" \n ")) else text.map { it.padStartEnd(3) }
-            LanguageModel.fit(data, 3).dump("/home/londet/git/text-gen-kt/files/models/cardsagainst_white_3.cbor")
-            LanguageModel.fit(data, 3, keepMinFreq = 1)
-                .dump("/home/londet/git/text-gen-kt/files/models/cardsagainst_white_3_mini.cbor")
-            LanguageModel.fit(data, 5, keepMinFreq = 1)
-                .dump("/home/londet/git/text-gen-kt/files/models/cardsagainst_white_5.cbor")
-            LanguageModel.fit(data, 7, keepMinFreq = 1)
-                .dump("/home/londet/git/text-gen-kt/files/models/cardsagainst_white_7.cbor")
-        }
     }
 }
