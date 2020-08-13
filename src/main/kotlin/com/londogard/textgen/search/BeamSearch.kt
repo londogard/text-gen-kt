@@ -13,21 +13,20 @@ open class BeamSearch(private val beams: Int) : Search {
         languageModel: LanguageModel,
         smoothing: Smoothing,
         seed: List<Int>
-    ): List<List<Int>> {
-        var sequences = listOf(seed to 0.0)
-        (0..numTokens).forEach { _ ->
-            val allCandidates = mutableListOf<Pair<List<Int>, Double>>()
-            for (i in sequences.indices) {
-                val (seq, score) = sequences[i]
-                val probs = smoothing
-                    .probabilitiesTopK(languageModel, seq, beams)
-                    .map { (index, prob) -> seq + listOf(index) to score - ln(prob) }
-
-                allCandidates.addAll(probs)
+    ): List<List<Int>> =
+        (0..numTokens)
+            .fold(sequenceOf(seed to 0.0)) { acc, _ ->
+                acc
+                    .flatMap { (seq, score) ->
+                        smoothing
+                            .probabilitiesTopK(languageModel, seq, beams)
+                            .map { (index, prob) -> seq + listOf(index) to score - ln(prob) }
+                            .asSequence()
+                    }
+                    .sortedBy { (_, score) -> score }
+                    .take(beams)
             }
-            allCandidates.sortBy { it.second }
-            sequences = allCandidates.take(beams)
-        }
-        return sequences.take(numReturnSequences).map { (sequence, _) -> sequence }
-    }
+            .take(numReturnSequences)
+            .map { (seq, _) -> seq }
+            .toList()
 }

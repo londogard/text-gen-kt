@@ -4,6 +4,7 @@ import com.londogard.textgen.utils.Sampling.sample
 import com.londogard.textgen.languagemodels.LanguageModel
 import com.londogard.textgen.smoothing.Smoothing
 
+/** Uses Top-K Sampling [Fan et. al (2018): https://arxiv.org/pdf/1805.04833.pdf] */
 class TopKSampleSearch(private val k: Int) : Search {
     override fun search(
         numReturnSequences: Int,
@@ -15,9 +16,11 @@ class TopKSampleSearch(private val k: Int) : Search {
     ): List<List<Int>> {
         return (1..numReturnSequences)
             .fold(emptyList()) { returnSequence, _ ->
-                returnSequence + listOf((1..numTokens).fold(seed) { history, _ ->
-                    history + listOf(sample(smoothing.probabilitiesTopK(languageModel, history, k)))
-                })
+                val generatedText = (1..numTokens).fold(seed) { history, _ ->
+                    val sample = sample(smoothing.probabilitiesTopK(languageModel, history, k))
+                    history.plusElement(sample)
+                }
+                returnSequence.plusElement(generatedText)
             }
     }
 }

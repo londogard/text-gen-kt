@@ -53,6 +53,8 @@ Only the simplest API-usages shown with no overrides. It should be straight-forw
  different options.  
  
 **Loading a Pretrained Model and Text Generation**  
+Find a few pre-trained models [here](https://github.com/londogard/text-gen-kt/blob/master/files/models/).  
+Includes shakespeare, Cards Against Humanity (Black & White).
 ```kotlin
 // Have a pretrained model locally, in say 'shakespeare.cbor'
 val absPathToModel = "/path/to/shakespeare.cbor"
@@ -85,7 +87,16 @@ generatedSentences.map(::println)
 ## Steps in text-generation
 Search calls smoothing to retrieve tokens & probabilities.   
 Smoothing access the Language Model to retrieve probabilities, and if they don't 
-exist smooth it out somehow. Smoothing then applies penalties and finally normalization.
+exist smooth it out somehow, meaning that you find the closest match. 
+>**Smoothing example**  
+> ["hej", "där", "borta"] has never been seen in the data, then we don't know what to generate as 
+>the next word. Simple back-off smoothing would then try to see if ["där", "borta"] exists in the data and try 
+>to generate a word from that instead.  
+>There's different 
+ways to smooth data, but in its essence it's the idea of finding a value of something we've never 
+seen before.
+   
+Smoothing then applies penalties and finally normalization.
 
 ## Structure
 There's a few different components

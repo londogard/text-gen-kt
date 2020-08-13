@@ -8,13 +8,12 @@ object Sampling {
     internal fun setSeed(seed: Long): Unit = random.setSeed(seed)
 
     fun sample(probs: List<Pair<Int, Double>>): Int {
-        probs.map { it.second }
         var rnd = random.nextDouble()
         probs.forEach { (i, score) ->
             rnd -= score
             if (rnd < 0) return i
         }
-        return probs.map { it.first }.last()
+        return probs.last().first
     }
 
     // Top-K Sampling Fan et. al (2018) (https://arxiv.org/pdf/1805.04833.pdf)

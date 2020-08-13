@@ -4,6 +4,7 @@ import com.londogard.textgen.utils.Sampling.sample
 import com.londogard.textgen.languagemodels.LanguageModel
 import com.londogard.textgen.smoothing.Smoothing
 
+/** Uses Top-P Sampling (nucleus) [Ari Holtzman et al. (2019): https://arxiv.org/abs/1904.09751] */
 open class TopPSampleSearch(private val p: Double) : Search {
     override fun search(
         numReturnSequences: Int,
@@ -12,15 +13,14 @@ open class TopPSampleSearch(private val p: Double) : Search {
         languageModel: LanguageModel,
         smoothing: Smoothing,
         seed: List<Int>
-    ): List<List<Int>> {
-        return (1..numReturnSequences)
+    ): List<List<Int>> =
+        (1..numReturnSequences)
             .fold(emptyList()) { returnSequence, _ ->
-                returnSequence + listOf((1..numTokens)
+                val generatedText = (1..numTokens)
                     .fold(seed) { history, _ ->
-                        history + listOf(
-                            sample(smoothing.probabilitiesTopP(languageModel, history, p))
-                        )
-                    })
+                        val sample = sample(smoothing.probabilitiesTopP(languageModel, history, p))
+                        history.plusElement(sample)
+                    }
+                returnSequence.plusElement(generatedText)
             }
-    }
 }

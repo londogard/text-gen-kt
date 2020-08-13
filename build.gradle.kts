@@ -15,8 +15,7 @@ buildscript {
 
 plugins {
     `maven-publish`
-    id("org.jetbrains.dokka") version "0.10.0"
-    id("com.github.ben-manes.versions") version "0.27.0"
+    id("org.jetbrains.dokka") version "0.10.1"
     id("org.jetbrains.kotlin.plugin.serialization") version ("1.3.72")
     kotlin("jvm") version "1.3.72"
 }
@@ -24,7 +23,7 @@ plugins {
 
 group = "com.londogard"
 version = "1.0.2-beta"
-val smileVersion = "2.4.0"
+val smileVersion = "2.5.0"
 val ktestVersion = "1.3.0"
 val serializationVersion = "0.20.0"
 
@@ -35,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
 
     implementation("com.github.haifengl:smile-nlp:$smileVersion")
     implementation("com.github.haifengl:smile-kotlin:$smileVersion")

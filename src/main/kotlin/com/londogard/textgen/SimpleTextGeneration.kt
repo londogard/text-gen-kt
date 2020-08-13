@@ -1,16 +1,13 @@
 package com.londogard.textgen
 
 import com.londogard.textgen.languagemodels.LanguageModel
-import com.londogard.textgen.normalization.LondogardNormalization
 import com.londogard.textgen.normalization.Normalization
 import com.londogard.textgen.normalization.SoftmaxNormalization
 import com.londogard.textgen.penalties.Penalty
-import com.londogard.textgen.smoothing.GreedyBackoff
-import com.londogard.textgen.smoothing.Smoothing
 import com.londogard.textgen.search.Search
 import com.londogard.textgen.search.TopKSampleSearch
-import com.londogard.textgen.utils.PadUtil
-
+import com.londogard.textgen.smoothing.GreedyBackoff
+import com.londogard.textgen.smoothing.Smoothing
 
 object SimpleTextGeneration {
     fun generateText(
