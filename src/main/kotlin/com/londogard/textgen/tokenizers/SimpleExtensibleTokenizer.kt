@@ -10,7 +10,7 @@ class SimpleExtensibleTokenizer(
     private val splitContraction: Boolean = false,
     private val whitespace: Pattern = WHITESPACE
     ) : Tokenizer {
-    override fun split(text: String): Array<String> {
+    override fun split(text: String): List<String> {
         var updatedText = text
         if (splitContraction) {
             updatedText = WONT_CONTRACTION.matcher(updatedText).replaceAll("$1ill not")
@@ -39,7 +39,7 @@ class SimpleExtensibleTokenizer(
                 result.add(token)
             }
         }
-        return result.toTypedArray()
+        return result
     }
 
     companion object {

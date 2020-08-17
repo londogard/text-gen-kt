@@ -22,7 +22,7 @@ plugins {
 
 
 group = "com.londogard"
-version = "1.0.2-beta"
+version = "1.1.0"
 val smileVersion = "2.5.0"
 val ktestVersion = "1.3.0"
 val serializationVersion = "0.20.0"

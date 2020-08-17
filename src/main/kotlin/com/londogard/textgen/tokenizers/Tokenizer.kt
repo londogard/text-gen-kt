@@ -5,6 +5,5 @@ interface Tokenizer {
     /**
      * Splits the string into a list of tokens.
      */
-    fun split(text: String): Array<String>
-
+    fun split(text: String): List<String>
 }
