@@ -1,11 +1,13 @@
 package com.londogard.textgen.utils
 
-import smile.math.Random
-
+import kotlin.random.Random
 
 object Sampling {
-    private val random = Random()
-    internal fun setSeed(seed: Long): Unit = random.setSeed(seed)
+    private var random: Random = Random
+
+    internal fun setSeed(seed: Long) {
+        random = Random(seed)
+    }
 
     fun sample(probs: List<Pair<Int, Double>>): Int {
         var rnd = random.nextDouble()
@@ -19,7 +21,7 @@ object Sampling {
     // Top-K Sampling Fan et. al (2018) (https://arxiv.org/pdf/1805.04833.pdf)
     fun DoubleArray.topK(k: Int): List<Int> = sortedArrayDescending()
         .take(k) // TODO performance improvement
-        .map(this::indexOf)
+        .map { value -> this.indexOfFirst { it == value } }
 
     // Top-P Sampling (aka nucleus) Ari Holtzman et al. (2019) (https://arxiv.org/abs/1904.09751)
     fun DoubleArray.topP(p: Double = 0.92): List<Int> {
@@ -31,6 +33,6 @@ object Sampling {
                 pAcc += d
                 pAcc <= p
             }
-            .map(this::indexOf)
+            .map { value -> this.indexOfFirst { it == value } }
     }
 }

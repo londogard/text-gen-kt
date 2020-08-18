@@ -6,6 +6,6 @@ object PadUtil {
     const val padStartStr: String = "$padStart "
     const val padEndStr: String = " $padEnd"
 
-    fun String.padStartEnd(n: Int, sep: String = " "): String =
+    fun String.padStartEnd(n: Int): String =
         "${padStartStr.repeat(n)}$this${padEndStr.repeat(n)}"
 }

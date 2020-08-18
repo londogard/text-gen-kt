@@ -54,7 +54,7 @@ Only the simplest API-usages shown with no overrides. It should be straight-forw
  
 **Loading a Pretrained Model and Text Generation**  
 Find a few pre-trained models [here](https://github.com/londogard/text-gen-kt/blob/master/files/models/).  
-Includes shakespeare, Cards Against Humanity (Black & White).
+Includes Shakespeare, Cards Against Humanity (Black & White Card versions).
 ```kotlin
 // Have a pretrained model locally, in say 'shakespeare.cbor'
 val absPathToModel = "/path/to/shakespeare.cbor"
@@ -62,11 +62,11 @@ val languageModel = LanguageModel.loadPretrainedModel(absPathToModel)
 
 // There exists a lot configs to change if you'd like, but this is the simplest text generation.
 val generatedSentences: List<String> = SimpleTextGeneration.generateText(languageModel = languageModel)
-generatedSentences.map(::println)
+generatedSentences.foreach(::println)
 
 SimpleTextGeneration
     .generateText(languageModel, seed = "This is who I am")
-    .map(::println)
+    .foreach(::println)
 
 // Prints the generated sentences. All which starts with "This is who I am"
 ```
@@ -81,7 +81,7 @@ val trainedModel = LanguageModel.trainModel(documents, n=3)
 trainModel.serialize("/path/to/model.cbor")
 
 val generatedSentences: List<String> = SimpleTextGeneration.generateText(languageModel = trainedModel)
-generatedSentences.map(::println)
+generatedSentences.foreach(::println)
 ```
 
 ## Steps in text-generation
@@ -147,9 +147,10 @@ A greedy search is to just select the top probability each time.
 Penalty is simply a way to penalize certain features. E.g. swear words might be off-limit, we 
 might not want to generate the same ngram again? It's up to you!
 
-# TODOs
+# Future TODOs
 
 - [ ] Allow Float / Short to decrease memory usage
+- [ ] Add TopPK (combine topP & topK)
 - [ ] General improvements (continuous)
 
 

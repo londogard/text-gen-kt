@@ -16,16 +16,15 @@ buildscript {
 plugins {
     `maven-publish`
     id("org.jetbrains.dokka") version "0.10.1"
-    id("org.jetbrains.kotlin.plugin.serialization") version ("1.3.72")
-    kotlin("jvm") version "1.3.72"
+    id("org.jetbrains.kotlin.plugin.serialization") version ("1.4.0")
+    kotlin("jvm") version "1.4.0"
 }
 
 
 group = "com.londogard"
 version = "1.1.0"
-val smileVersion = "2.5.0"
 val ktestVersion = "1.3.0"
-val serializationVersion = "0.20.0"
+val serializationVersion = "1.0.0-RC"
 
 repositories {
     mavenCentral()
@@ -35,11 +34,10 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    api("org.slf4j:slf4j-api:1.7.30")
+    // implementation("it.unimi.dsi:fastutil:8.4.1")
 
-    implementation("com.github.haifengl:smile-nlp:$smileVersion")
-    implementation("com.github.haifengl:smile-kotlin:$smileVersion")
-    
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serializationVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:$ktestVersion")

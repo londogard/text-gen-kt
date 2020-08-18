@@ -1,16 +1,21 @@
 package com.londogard.textgen.tokenizers
 
+import kotlinx.serialization.Serializable
 import java.util.*
 import java.util.regex.Pattern
 
 /**
  * A simple tokenizer which allows you to define your own whitespace to split upon.
  */
+@Serializable
 class SimpleExtensibleTokenizer(
     private val splitContraction: Boolean = false,
-    private val whitespace: Pattern = WHITESPACE
+    private val whitespaceRegex: String = WHITESPACE
     ) : Tokenizer {
+    override val stringJoiner: String = " "
+
     override fun split(text: String): List<String> {
+        val whitespacePattern = Pattern.compile(whitespaceRegex)
         var updatedText = text
         if (splitContraction) {
             updatedText = WONT_CONTRACTION.matcher(updatedText).replaceAll("$1ill not")
@@ -31,7 +36,7 @@ class SimpleExtensibleTokenizer(
         updatedText = DELIMITERS[2].matcher(updatedText).replaceAll(" $1")
         updatedText = DELIMITERS[3].matcher(updatedText).replaceAll(" . ")
         updatedText = DELIMITERS[4].matcher(updatedText).replaceAll(" $1 ")
-        val words = whitespace.split(updatedText)
+        val words = whitespacePattern.split(updatedText)
 
         val result = ArrayList<String>()
         for (token in words) {
@@ -78,6 +83,6 @@ class SimpleExtensibleTokenizer(
                 Pattern.compile("(?U)\\. *(\\n|$)"),  // Separate periods that come before newline or end of string.
                 Pattern.compile("(?U)(\\.{3,})")  // Separate continuous periods such as ... in ToC.
             )
-        private val WHITESPACE: Pattern = Pattern.compile("(?U)\\s+")
+        private val WHITESPACE: String = "(?U)\\s+"
     }
 }
