@@ -37,9 +37,12 @@ class LanguageModel(
             documents: List<String>,
             n: Int,
             tokenizer: Tokenizer = SimpleExtensibleTokenizer(whitespaceRegex = " "),
-            keepMinFreq: Int = 0 // 0 = at least one occurrence, 1 = at least two occurrences, etc... Applied to all ngrams
+            keepMinFreq: Int = 0, // 0 = at least one occurrence, 1 = at least two occurrences, etc... Applied to all ngrams
+            preprocessing: List<(String) -> String> = emptyList(),   // Example: listOf(TextNormalizer::normalize, String::toLowerCase)
         ): LanguageModel {
-            val tokens = documents.map(tokenizer::split)
+            val preprocessedDocs = documents
+                .map { subDoc -> preprocessing.fold(subDoc) { acc, preprocessor -> preprocessor(acc) } }
+            val tokens = preprocessedDocs.map(tokenizer::split)
             val reverseDict = tokens.flatten().toHashSet().let { uniqueTokens ->
                 HashMap<String, Int>(uniqueTokens.size).apply { putAll(uniqueTokens.zip(uniqueTokens.indices)) }
             }
@@ -50,21 +53,23 @@ class LanguageModel(
                 .fold(emptyMap<List<Int>, Int>()) { acc, ngram ->
                     when {
                         ngram <= 2 || previousMatch ->
-                            acc + tokensList
+                            acc.merge(tokensList
+                                .filter { docToken -> docToken.size >= ngram }
                                 .flatMap { docToken ->
                                     docToken
                                         .indices
                                         .mapNotNull { index -> // Even though autobox applies to List<E> we save space here because of views.
                                             val topIdx = (index + ngram).coerceAtMost(docToken.size)
-                                            if (ngram <= 2 || acc.contains(docToken.subList(index, topIdx - 1)))
+
+                                            if (ngram <= 2 || (acc.contains(docToken.subList(index, topIdx - 1))))
                                                 docToken.subList(index, topIdx)
                                             else null
                                         }
                                 }
                                 .groupingBy { it }
                                 .eachCount()
-                                .filter { (_, value) -> value > keepMinFreq }
-                                .also { if (it.isEmpty()) previousMatch = false }
+                                .filter { (key, value) -> key.size < ngram || value > keepMinFreq }
+                                .also { if (it.isEmpty()) previousMatch = false })
                         else -> acc
                     }
                 }
@@ -87,5 +92,10 @@ class LanguageModel(
             .getOrDefault(history.takeLast(n), emptyList())
             .let { entries -> penalties.fold(entries) { acc, penalty -> penalty.penalize(acc, history) } }
             .filterNot { (_, score) -> score <= 0 }
+
+        private fun <K> Map<K, Int>.merge(otherMap: Map<K, Int>): Map<K, Int> =
+            (keys + otherMap.keys).associateWith { key ->
+                getOrDefault(key, 0) + otherMap.getOrDefault(key, 0)
+            }
     }
 }

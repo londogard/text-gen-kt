@@ -1,15 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
-    val kotlin_version = "1.3.72"
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-
+    val kotlinVersion = "1.4.0"
     dependencies {
-        classpath(kotlin("gradle-plugin", kotlin_version))
-        classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlin_version")
+        classpath(kotlin("gradle-plugin", kotlinVersion))
+        classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
     }
 }
 
@@ -23,8 +18,8 @@ plugins {
 
 group = "com.londogard"
 version = "1.1.0"
-val ktestVersion = "1.3.0"
 val serializationVersion = "1.0.0-RC"
+val kotlinVersion = "1.4.0"
 
 repositories {
     mavenCentral()
@@ -40,8 +35,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test:$ktestVersion")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$ktestVersion")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
     testImplementation("org.amshove.kluent:kluent:1.61")
 }
 

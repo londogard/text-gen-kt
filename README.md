@@ -147,11 +147,12 @@ A greedy search is to just select the top probability each time.
 Penalty is simply a way to penalize certain features. E.g. swear words might be off-limit, we 
 might not want to generate the same ngram again? It's up to you!
 
-# Future TODOs
-
-- [ ] Allow Float / Short to decrease memory usage
-- [ ] Add TopPK (combine topP & topK)
-- [ ] General improvements (continuous)
-
+## Available Models
+- shakespeare_char.cbor (n=100, keepMinFreq=5)
+- shakespeare_word.cbor (n=100, keepMinFreq=1)
+- cardsagainst_white_char.cbor (n=100, keepMinFreq=1)
+- cardsagainst_white_word.cbor (n=100, keepMinFreq=1)
+- cardsagainst_black_char.cbor (n=100, keepMinFreq=1)
+- cardsagainst_black_word.cbor (n=100, keepMinFreq=1)
 
 Converted HTML using https://r12a.github.io/app-conversion/

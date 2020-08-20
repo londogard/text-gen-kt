@@ -11,7 +11,7 @@ import java.util.regex.Pattern
 class SimpleExtensibleTokenizer(
     private val splitContraction: Boolean = false,
     private val whitespaceRegex: String = WHITESPACE
-    ) : Tokenizer {
+) : Tokenizer {
     override val stringJoiner: String = " "
 
     override fun split(text: String): List<String> {
@@ -77,12 +77,12 @@ class SimpleExtensibleTokenizer(
         )
         private val DELIMITERS: Array<Pattern> =
             arrayOf(
-                Pattern.compile("((?U)[^\\w\\.\\'\\-\\/,&<>])"),  // Separate most punctuation
+                Pattern.compile("((?U)[^\\w\\.\\'\\-\\/,&<>:])"),  // Separate most punctuation
                 Pattern.compile("(?U)(,\\s)"),  // Separate commas if they're followed by space (e.g., don't separate 2,500)
                 Pattern.compile("(?U)('\\s)"),  // Separate single quotes if they're followed by a space.
                 Pattern.compile("(?U)\\. *(\\n|$)"),  // Separate periods that come before newline or end of string.
                 Pattern.compile("(?U)(\\.{3,})")  // Separate continuous periods such as ... in ToC.
             )
-        private val WHITESPACE: String = "(?U)\\s+"
+        private const val WHITESPACE: String = "[^\\S\\r\\n]+"
     }
 }

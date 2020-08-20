@@ -6,6 +6,7 @@ import com.londogard.textgen.normalization.LondogardNormalization
 import com.londogard.textgen.normalization.Normalization
 import com.londogard.textgen.penalties.Penalty
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 
@@ -16,12 +17,15 @@ class StupidBackoff(
 ) : Smoothing {
     override fun predict(languageModel: LanguageModel, history: List<Int>, token: Int): Double {
         val range = min(languageModel.n, history.size) downTo 0
+        var alphaReduce = 0
         for (i in range) {
+            val alphaPow = alpha.pow(range.first - i - alphaReduce)
             val tmpProb = languageModel
                 .retrieveNgramData(history, emptyList(), i)
                 .find { (key, _) -> key == token }?.second
 
-            if (tmpProb != null) return (tmpProb * alpha.pow(i.toDouble()))
+            if (tmpProb != null) return (tmpProb * alphaPow)
+            else alphaReduce++
         }
         return languageModel.internalLanguageModel[emptyList()]?.find { (key, _) -> key == token }?.second ?: 0.0
     }
@@ -33,13 +37,16 @@ class StupidBackoff(
     ): List<Pair<Int, Double>> {
         val finalEntries: MutableList<Pair<Int, Double>> = mutableListOf()
         val range = min(languageModel.n, history.size) downTo 0
+        var alphaReduce = 0
         for (i in range) {
+            val alphaPow = alpha.pow(range.first - i - alphaReduce)
             languageModel
                 .retrieveNgramData(history, penalties, i)
                 .take(k - finalEntries.size)
-                .map { (index, score) -> index to score * alpha.pow(i.toDouble()) }
+                .map { (index, score) -> index to score * alphaPow }
                 .let(finalEntries::addAll)
 
+            if (finalEntries.isEmpty()) alphaReduce++
             if (finalEntries.size == k) return normalizer.normalize(finalEntries)
         }
 
@@ -55,16 +62,18 @@ class StupidBackoff(
         val normP = min(abs(p), 1.0)
         var totalScore = 0.0
         val range = min(languageModel.n, history.size) downTo 0
+        var alphaReduce = 0
         for (i in range) {
+            val alphaPow = alpha.pow(range.first - i - alphaReduce)
             languageModel
                 .retrieveNgramData(history, penalties, i)
-                .map { (index, score) -> index to score * alpha.pow(i.toDouble()) }
+                .map { (index, score) -> index to score * alphaPow }
                 .takeWhile { (_, score) ->
                     totalScore += score
                     (totalScore - score) < normP
                 }
                 .let(finalEntries::addAll)
-
+            if (finalEntries.isEmpty()) alphaReduce++
             if (totalScore >= normP) return normalizer.normalize(finalEntries)
         }
 
