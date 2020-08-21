@@ -7,6 +7,7 @@ import com.londogard.textgen.normalization.SimpleNormalization
 import com.londogard.textgen.penalties.Penalty
 import com.londogard.textgen.smoothing.Smoothing.Companion.takeP
 
+/** [[NoSmoothing]] is a search technique which returns empty if we don't have a word for the exact history given. */
 class NoSmoothing(
     override val normalizer: Normalization = SimpleNormalization(),
     override val penalties: List<Penalty> = emptyList()

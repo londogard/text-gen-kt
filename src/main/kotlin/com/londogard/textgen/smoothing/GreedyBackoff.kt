@@ -8,6 +8,10 @@ import com.londogard.textgen.penalties.Penalty
 import kotlin.math.abs
 import kotlin.math.min
 
+/**
+ * [[GreedyBackoff]] applies a greedy approach which picks the top choices while backing off WITHOUT a penalty, unlike
+ *  how [[StupidBackoff]] works which applies a penalty.
+ */
 class GreedyBackoff(
     override val normalizer: Normalization = SimpleNormalization(),
     override val penalties: List<Penalty> = emptyList()

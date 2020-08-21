@@ -5,6 +5,7 @@ import com.londogard.textgen.normalization.Normalization
 import com.londogard.textgen.penalties.Penalty
 import kotlin.math.abs
 
+/** [[Smoothing]] is a way to smooth data, if we can't find something we make it up somehow. Perhaps by using less history */
 interface Smoothing {
     val normalizer: Normalization
     val penalties: List<Penalty>

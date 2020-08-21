@@ -3,9 +3,12 @@ package com.londogard.textgen.search
 import com.londogard.textgen.languagemodels.LanguageModel
 import com.londogard.textgen.smoothing.Smoothing
 
+/**
+ * [[Search]] is the way that the [[LanguageModel]] is searched, different types of search applies different techniques.
+ */
 interface Search {
     /**
-     * Searches the Language Model for the numReturnSequences, with numTokens in each, best choices given configuration.
+     * Searches the [[LanguageModel]] for the [numReturnSequences], with [numTokens] in each, best choices given configuration.
      */
     fun search(
         numReturnSequences: Int,

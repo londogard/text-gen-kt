@@ -15,7 +15,7 @@ class LanguageModelTest {
         val languageModel = LanguageModel.fit(testText, n = 3)
         val dict = languageModel.dictionary
         val rd = languageModel.getReverseDictionary()
-        val lm = languageModel.getLanguageModel()
+        val lm = languageModel.internalLanguageModel
         val unigramLm = languageModel.internalLanguageModel[emptyList()]?.toMap() ?: emptyMap()
 
         dict.values.toSet() shouldContain "Hello"

@@ -11,6 +11,9 @@ typealias InternalLanguageModel = Map<List<Int>, List<Pair<Int, Double>>>
 typealias InternalVocabulary = Map<Int, String>
 typealias InternalReverseVocabulary = Map<String, Int>
 
+/**
+ * [[LanguageModel]] is the core data, this is the "mastermind" which we extract data from using different techniques.
+ */
 @Serializable
 class LanguageModel(
     val tokenizer: Tokenizer,
@@ -20,15 +23,12 @@ class LanguageModel(
 ) {
     fun getReverseDictionary(): InternalReverseVocabulary = dictionary.entries.associateBy({ it.value }) { it.key }
 
-    fun getLanguageModel(): InternalLanguageModel = internalLanguageModel
-
     @ExperimentalSerializationApi
     fun dump(absolutePath: String): Unit = SerializerUtil.encodeLanguageModel(absolutePath, this)
 
     companion object {
         @ExperimentalSerializationApi
-        fun dump(languageModel: LanguageModel, absolutePath: String): Unit =
-            SerializerUtil.encodeLanguageModel(absolutePath, languageModel)
+        fun dump(languageModel: LanguageModel, absolutePath: String): Unit = languageModel.dump(absolutePath)
 
         @ExperimentalSerializationApi
         fun load(absolutePath: String): LanguageModel = SerializerUtil.decodeLanguageModelByAbsPath(absolutePath)

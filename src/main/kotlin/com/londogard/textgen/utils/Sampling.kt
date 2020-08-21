@@ -2,6 +2,7 @@ package com.londogard.textgen.utils
 
 import kotlin.random.Random
 
+/** [[Sampling]] is a util that helps set the random seed and sample data */
 object Sampling {
     private var random: Random = Random
 

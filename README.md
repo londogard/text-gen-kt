@@ -89,24 +89,24 @@ Search calls smoothing to retrieve tokens & probabilities.
 Smoothing access the Language Model to retrieve probabilities, and if they don't 
 exist smooth it out somehow, meaning that you find the closest match. 
 >**Smoothing example**  
-> ["hej", "där", "borta"] has never been seen in the data, then we don't know what to generate as 
->the next word. Simple back-off smoothing would then try to see if ["där", "borta"] exists in the data and try 
+> \["hej", "där", "borta"] has never been seen in the data, then we don't know what to generate as 
+>the next word. Simple back-off smoothing would then try to see if \["där", "borta"] exists in the data and try 
 >to generate a word from that instead.  
 >There's different 
-ways to smooth data, but in its essence it's the idea of finding a value of something we've never 
-seen before.
+> ways to smooth data, but in its essence it's the idea of finding a value of something we've never 
+> seen before.
    
 Smoothing then applies penalties and finally normalization.
 
 ## Structure
 There's a few different components
 
-1. Language Model
-2. Tokenizer
-3. Normalization
-4. Smoothing
-5. Search
-6. Penalties
+ 1. Language Model
+ 2. Tokenizer
+ 3. Normalization
+ 4. Smoothing
+ 5. Search
+ 6. Penalties
 
 The idea is that the Language Model is basically a storage of probabilities.  
 To generate text we somehow need to tap into this 'database' and fetch values 
@@ -148,9 +148,9 @@ Penalty is simply a way to penalize certain features. E.g. swear words might be 
 might not want to generate the same ngram again? It's up to you!
 
 ## Available Models
-- shakespeare_char.cbor (n=100, keepMinFreq=5)
-- shakespeare_word.cbor (n=100, keepMinFreq=1)
-- cardsagainst_white_char.cbor (n=100, keepMinFreq=1)
-- cardsagainst_white_word.cbor (n=100, keepMinFreq=1)
-- cardsagainst_black_char.cbor (n=100, keepMinFreq=1)
-- cardsagainst_black_word.cbor (n=100, keepMinFreq=1)
+ - shakespeare_char.cbor (n=100, keepMinFreq=5)
+ - shakespeare_word.cbor (n=100, keepMinFreq=1)
+ - cardsagainst_white_char.cbor (n=100, keepMinFreq=1)
+ - cardsagainst_white_word.cbor (n=100, keepMinFreq=1)
+ - cardsagainst_black_char.cbor (n=100, keepMinFreq=1)
+ - cardsagainst_black_word.cbor (n=100, keepMinFreq=1)

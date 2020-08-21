@@ -1,5 +1,6 @@
 package com.londogard.textgen.utils
 
+/** [[PadUtil]] includes padding for Strings and Chars. */
 object PadUtil {
     const val padStart: Char = '\u0002'
     const val padEnd: Char = '\u0003'

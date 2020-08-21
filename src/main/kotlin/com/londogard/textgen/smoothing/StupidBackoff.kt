@@ -6,10 +6,10 @@ import com.londogard.textgen.normalization.LondogardNormalization
 import com.londogard.textgen.normalization.Normalization
 import com.londogard.textgen.penalties.Penalty
 import kotlin.math.abs
-import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 
+/** [[StupidBackoff]] works the same as [[GreedyBackoff]] but applies penalty alpha for each step back, 3 steps back = alpa^3 */
 class StupidBackoff(
     var alpha: Double = 0.4,
     override val normalizer: Normalization = LondogardNormalization(0.7),

@@ -3,6 +3,7 @@ package com.londogard.textgen.tokenizers
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/** [[SimpleCharTokenizer]] is a simple tokenizer that extract every char into a list. */
 @Serializable
 @SerialName("tokenizer")
 class SimpleCharTokenizer: Tokenizer {
