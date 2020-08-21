@@ -1,0 +1,7 @@
+tasks:
+  - init: ./gradlew clean build
+    command: ./gradlew test
+
+vscode:
+  extensions:
+    - mathiasfrohlich.Kotlin@1.7.1:2Uw0hH38NcpgInldjuwF3g==

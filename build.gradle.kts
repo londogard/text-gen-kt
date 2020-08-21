@@ -1,31 +1,25 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
-    val kotlin_version = "1.3.72"
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-
+    val kotlinVersion = "1.4.0"
     dependencies {
-        classpath(kotlin("gradle-plugin", kotlin_version))
-        classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlin_version")
+        classpath(kotlin("gradle-plugin", kotlinVersion))
+        classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
     }
 }
 
-
 plugins {
     `maven-publish`
-    id("org.jetbrains.dokka") version "0.10.0"
-    id("com.github.ben-manes.versions") version "0.27.0"
-    id("org.jetbrains.kotlin.plugin.serialization") version ("1.3.72")
-    kotlin("jvm") version "1.3.72"
+    id("org.jetbrains.dokka") version "0.10.1"
+    id("org.jetbrains.kotlin.plugin.serialization") version ("1.4.0")
+    kotlin("jvm") version "1.4.0"
 }
 
 
 group = "com.londogard"
-version = "1.0.2-beta"
-val smileVersion = "2.4.0"
+version = "1.1.0"
+val serializationVersion = "1.0.0-RC"
+val kotlinVersion = "1.4.0"
 
 repositories {
     mavenCentral()
@@ -34,13 +28,16 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
+    api("org.slf4j:slf4j-api:1.7.30")
+    // implementation("it.unimi.dsi:fastutil:8.4.1")
 
-    implementation("com.github.haifengl:smile-nlp:$smileVersion")
-    implementation("com.github.haifengl:smile-kotlin:$smileVersion")
-    
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:0.20.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
+    testImplementation("org.amshove.kluent:kluent:1.61")
 }
 
 tasks.withType<KotlinCompile> {
