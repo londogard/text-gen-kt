@@ -154,5 +154,3 @@ might not want to generate the same ngram again? It's up to you!
 - cardsagainst_white_word.cbor (n=100, keepMinFreq=1)
 - cardsagainst_black_char.cbor (n=100, keepMinFreq=1)
 - cardsagainst_black_word.cbor (n=100, keepMinFreq=1)
-
-Converted HTML using https://r12a.github.io/app-conversion/

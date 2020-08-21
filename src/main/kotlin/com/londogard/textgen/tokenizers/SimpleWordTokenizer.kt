@@ -8,7 +8,7 @@ import java.util.regex.Pattern
  * A simple tokenizer which allows you to define your own whitespace to split upon.
  */
 @Serializable
-class SimpleExtensibleTokenizer(
+class SimpleWordTokenizer(
     private val splitContraction: Boolean = false,
     private val whitespaceRegex: String = WHITESPACE
 ) : Tokenizer {

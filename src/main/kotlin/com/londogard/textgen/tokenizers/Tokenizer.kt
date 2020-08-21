@@ -12,7 +12,7 @@ interface Tokenizer {
         val module = SerializersModule {
             polymorphic(Tokenizer::class) {
                 subclass(SimpleCharTokenizer::class, SimpleCharTokenizer.serializer())
-                subclass(SimpleExtensibleTokenizer::class, SimpleExtensibleTokenizer.serializer())
+                subclass(SimpleWordTokenizer::class, SimpleWordTokenizer.serializer())
             }
         }
     }

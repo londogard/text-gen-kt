@@ -15,8 +15,8 @@ import com.londogard.textgen.utils.Sampling
 object SimpleTextGeneration {
     fun generateText(
         languageModel: LanguageModel,
-        numReturnSequences: Int = 3,
-        numTokens: Int = 50,
+        numReturnSequences: Int = 1,
+        numTokens: Int = 250,
         temperature: Double = 0.2,
         normalization: Normalization = SoftmaxNormalization(temperature),
         searchTechnique: Search = TopKSampleSearch(10),

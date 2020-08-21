@@ -1,7 +1,7 @@
 package com.londogard.textgen.languagemodels
 
 import com.londogard.textgen.penalties.Penalty
-import com.londogard.textgen.tokenizers.SimpleExtensibleTokenizer
+import com.londogard.textgen.tokenizers.SimpleWordTokenizer
 import com.londogard.textgen.tokenizers.Tokenizer
 import com.londogard.textgen.utils.SerializerUtil
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -36,7 +36,7 @@ class LanguageModel(
         fun fit(
             documents: List<String>,
             n: Int,
-            tokenizer: Tokenizer = SimpleExtensibleTokenizer(whitespaceRegex = " "),
+            tokenizer: Tokenizer = SimpleWordTokenizer(),
             keepMinFreq: Int = 0, // 0 = at least one occurrence, 1 = at least two occurrences, etc... Applied to all ngrams
             preprocessing: List<(String) -> String> = emptyList(),   // Example: listOf(TextNormalizer::normalize, String::toLowerCase)
         ): LanguageModel {
@@ -53,23 +53,20 @@ class LanguageModel(
                 .fold(emptyMap<List<Int>, Int>()) { acc, ngram ->
                     when {
                         ngram <= 2 || previousMatch ->
-                            acc.merge(tokensList
+                            acc + tokensList
                                 .filter { docToken -> docToken.size >= ngram }
                                 .flatMap { docToken ->
-                                    docToken
-                                        .indices
-                                        .mapNotNull { index -> // Even though autobox applies to List<E> we save space here because of views.
-                                            val topIdx = (index + ngram).coerceAtMost(docToken.size)
-
-                                            if (ngram <= 2 || (acc.contains(docToken.subList(index, topIdx - 1))))
-                                                docToken.subList(index, topIdx)
+                                    (0..docToken.size - ngram)
+                                        .mapNotNull { index ->  // Even though autobox applies to List<E> we save space here because of views.
+                                            if (ngram <= 2 || acc.contains(docToken.subList(index, index + ngram - 1)))
+                                                docToken.subList(index, index + ngram)
                                             else null
                                         }
                                 }
                                 .groupingBy { it }
                                 .eachCount()
-                                .filter { (key, value) -> key.size < ngram || value > keepMinFreq }
-                                .also { if (it.isEmpty()) previousMatch = false })
+                                .filter { (_, value) -> value > keepMinFreq }
+                                .also { if (it.isEmpty()) previousMatch = false }
                         else -> acc
                     }
                 }
@@ -92,10 +89,5 @@ class LanguageModel(
             .getOrDefault(history.takeLast(n), emptyList())
             .let { entries -> penalties.fold(entries) { acc, penalty -> penalty.penalize(acc, history) } }
             .filterNot { (_, score) -> score <= 0 }
-
-        private fun <K> Map<K, Int>.merge(otherMap: Map<K, Int>): Map<K, Int> =
-            (keys + otherMap.keys).associateWith { key ->
-                getOrDefault(key, 0) + otherMap.getOrDefault(key, 0)
-            }
     }
 }
