@@ -10,16 +10,16 @@ buildscript {
 
 plugins {
     `maven-publish`
-    id("org.jetbrains.dokka") version "0.10.1"
+    id("org.jetbrains.dokka") version "1.4.20"
     id("org.jetbrains.kotlin.plugin.serialization") version ("1.4.0")
-    kotlin("jvm") version "1.4.0"
+    kotlin("jvm") version "1.4.21"
 }
 
 
 group = "com.londogard"
 version = "1.1.0"
 val serializationVersion = "1.0.1"
-val kotlinVersion = "1.4.0"
+val kotlinVersion = "1.4.21"
 
 repositories {
     mavenCentral()
@@ -42,18 +42,6 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.dokka {
-    outputFormat = "html"
-    outputDirectory = "$buildDir/javadoc"
-}
-
-val dokkaJar by tasks.creating(org.gradle.jvm.tasks.Jar::class) {
-    group = JavaBasePlugin.DOCUMENTATION_GROUP
-    description = "Assembles Kotlin docs with Dokka"
-    classifier = "javadoc"
-    from(tasks.dokka)
 }
 
 publishing {
