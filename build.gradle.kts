@@ -12,7 +12,7 @@ plugins {
     `maven-publish`
     id("org.jetbrains.dokka") version "1.4.20"
     id("org.jetbrains.kotlin.plugin.serialization") version ("1.4.0")
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.4.21-2"
 }
 
 
