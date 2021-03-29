@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
-    val kotlinVersion = "1.4.31"
+    val kotlinVersion = "1.4.32"
     dependencies {
         classpath(kotlin("gradle-plugin", kotlinVersion))
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
