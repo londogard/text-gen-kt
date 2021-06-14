@@ -37,7 +37,7 @@ dependencies {
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
-    testImplementation("org.amshove.kluent:kluent:1.65")
+    testImplementation("org.amshove.kluent:kluent:1.66")
 }
 
 tasks.withType<KotlinCompile> {
