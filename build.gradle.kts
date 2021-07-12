@@ -18,7 +18,7 @@ plugins {
 
 group = "com.londogard"
 version = "1.1.0"
-val serializationVersion = "1.2.1"
+val serializationVersion = "1.2.2"
 val kotlinVersion = "1.4.21"
 
 repositories {
