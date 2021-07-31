@@ -9,6 +9,10 @@ Text Generation in Kotlin that's 'light' on resources.
  - Easy-to-use API (training & generating text)
  - Customizable
 
+Possible to test on [londogard.com](https://londogard.com/projects/textgen)
+![image](https://user-images.githubusercontent.com/7490199/127736868-4357afb6-8376-4625-b087-7d6e0b0c391e.png)
+
+
 ## Installation
 <details open>
 <summary><b>Jitpack</b> (the easiest)</summary>
