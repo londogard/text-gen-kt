@@ -18,7 +18,7 @@ plugins {
 
 group = "com.londogard"
 version = "1.1.0"
-val serializationVersion = "1.2.1"
+val serializationVersion = "1.2.2"
 val kotlinVersion = "1.4.21"
 
 repositories {
@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    api("org.slf4j:slf4j-api:1.7.31")
+    api("org.slf4j:slf4j-api:1.7.36")
     // implementation("it.unimi.dsi:fastutil:8.4.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
@@ -37,7 +37,7 @@ dependencies {
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
-    testImplementation("org.amshove.kluent:kluent:1.67")
+    testImplementation("org.amshove.kluent:kluent:1.68")
 }
 
 tasks.withType<KotlinCompile> {
