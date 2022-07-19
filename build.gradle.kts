@@ -18,7 +18,7 @@ plugins {
 
 group = "com.londogard"
 version = "1.1.0"
-val serializationVersion = "1.2.1"
+val serializationVersion = "1.3.3"
 val kotlinVersion = "1.4.21"
 
 repositories {
@@ -37,7 +37,7 @@ dependencies {
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
-    testImplementation("org.amshove.kluent:kluent:1.67")
+    testImplementation("org.amshove.kluent:kluent:1.68")
 }
 
 tasks.withType<KotlinCompile> {
