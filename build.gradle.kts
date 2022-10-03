@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    api("org.slf4j:slf4j-api:1.7.31")
+    api("org.slf4j:slf4j-api:2.0.3")
     // implementation("it.unimi.dsi:fastutil:8.4.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
